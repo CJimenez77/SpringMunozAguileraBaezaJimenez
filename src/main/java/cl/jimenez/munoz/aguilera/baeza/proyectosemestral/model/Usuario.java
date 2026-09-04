@@ -65,5 +65,6 @@ public class Usuario {
     public void setFoto(String foto) { this.foto = foto; }
 
     public boolean isActivo() { return activo; }
+    public boolean getActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 }
