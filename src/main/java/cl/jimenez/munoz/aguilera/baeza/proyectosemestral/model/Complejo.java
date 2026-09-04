@@ -11,9 +11,12 @@ public class Complejo {
 
     @Column(nullable = false)
     private String nombre_complejo;
+
     @Column(nullable = false)
     private String direccion_complejo;
-    private String ubicacionMapa; //Para guardar URL o coordenadas
+
+    @Column(columnDefinition = "TEXT")
+    private String ubicacionMapa;
 
     public Complejo(){}
 
