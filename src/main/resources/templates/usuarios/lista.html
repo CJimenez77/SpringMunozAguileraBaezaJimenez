@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Usuarios</title>
+    <title>Usuarios - CanchasYa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        .table> :not(caption)>*>* {
+        .table > :not(caption) > * > * {
             padding: 0.9rem 0.75rem;
         }
-
         .btn-action {
             display: inline-flex;
             align-items: center;
@@ -21,126 +19,146 @@
         }
     </style>
 </head>
-
 <body class="bg-light">
 
-    <div class="container py-4 py-md-5">
-
-        <div class="row align-items-center mb-4 g-3">
-            <div class="col-12 col-sm-7 col-md-8">
-                <h2 class="fw-bold mb-1 text-dark">Gestión de Usuarios</h2>
-                <p class="text-muted small mb-0">Lista general de usuarios registrados en el sistema</p>
-            </div>
-            <div class="col-12 col-sm-5 col-md-4 text-sm-end">
-                <a th:href="@{/usuarios/nuevo}" class="btn btn-success px-3 shadow-sm btn-action w-100 w-sm-auto">
-                    <i class="bi bi-person-plus-fill"></i>
-                    <span>Nuevo Usuario</span>
-                </a>
-                <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
+            <i class="bi bi-trophy-fill text-warning"></i>
+            <span>CanchasYa</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/usuarios}"><i class="bi bi-people-fill me-1"></i>Usuarios</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
                     <i class="bi bi-box-arrow-right"></i>
-                    <span>Cerrar Sesión</span>
                 </a>
-            </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(usuarios)}" class="card shadow-sm border-0 text-center py-5">
-            <div class="card-body">
-                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
-                <h5 class="fw-semibold mt-3 mb-1">No hay usuarios registrados</h5>
-                <p class="text-muted small">Crea el primer usuario haciendo clic en el botón superior.</p>
-            </div>
-        </div>
-
-        <div th:if="${!#lists.isEmpty(usuarios)}">
-
-            <div class="d-md-none">
-                <div th:each="u : ${usuarios}" class="card shadow-sm border-0 mb-3">
-                    <div class="card-body p-3">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <img th:src="${u.foto != null && !u.foto.isEmpty() ? u.foto : 'https://placehold.co/60x60?text=U'}"
-                                class="rounded-circle border" width="60" height="60" style="object-fit: cover;">
-                            <div class="flex-grow-1 overflow-hidden">
-                                <h6 class="fw-bold mb-1 text-truncate" th:text="${u.nombre}"></h6>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle"
-                                    th:text="${u.rol}"></span>
-                            </div>
-                        </div>
-
-                        <div class="small bg-light p-2 rounded mb-3">
-                            <div class="text-truncate mb-1">
-                                <i class="bi bi-envelope text-secondary me-1"></i>
-                                <span th:text="${u.email}"></span>
-                            </div>
-                            <div>
-                                <i class="bi bi-telephone text-secondary me-1"></i>
-                                <span
-                                    th:text="${u.telefono != null && !u.telefono.isEmpty() ? u.telefono : 'Sin teléfono'}"></span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <a th:href="@{/usuarios/editar/{id}(id=${u.id})}"
-                                class="btn btn-outline-primary btn-sm flex-fill btn-action">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}"
-                                class="btn btn-outline-danger btn-sm flex-fill btn-action"
-                                onclick="return confirm('¿Seguro que deseas eliminar este usuario?');">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow-sm border-0 d-none d-md-block overflow-hidden">
-                <div class="table-responsive mb-0">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th class="ps-3" style="width: 70px;">Foto</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Rol</th>
-                                <th class="text-end pe-4" style="width: 200px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="u : ${usuarios}">
-                                <td class="ps-3">
-                                    <img th:src="${u.foto != null && !u.foto.isEmpty() ? u.foto : 'https://placehold.co/45x45?text=U'}"
-                                        class="rounded-circle border" width="45" height="45" style="object-fit: cover;">
-                                </td>
-                                <td class="fw-semibold" th:text="${u.nombre}"></td>
-                                <td class="text-muted" th:text="${u.email}"></td>
-                                <td class="text-muted"
-                                    th:text="${u.telefono != null && !u.telefono.isEmpty() ? u.telefono : '-'}"></td>
-                                <td>
-                                    <span class="badge bg-primary" th:text="${u.rol}"></span>
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="d-inline-flex gap-2">
-                                        <a th:href="@{/usuarios/editar/{id}(id=${u.id})}"
-                                            class="btn btn-sm btn-outline-primary btn-action px-2 py-1">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </a>
-                                        <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}"
-                                            class="btn btn-sm btn-outline-danger btn-action px-2 py-1"
-                                            onclick="return confirm('¿Seguro que deseas eliminar este usuario?');">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
+</nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div class="container py-4 py-md-5">
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-12 col-sm-7 col-md-8">
+            <h2 class="fw-bold mb-1 text-dark">Gestión de Usuarios</h2>
+            <p class="text-muted small mb-0">Control de perfiles, cuentas y roles autorizados</p>
+        </div>
+        <div class="col-12 col-sm-5 col-md-4 text-sm-end">
+            <a th:href="@{/usuarios/nuevo}" class="btn btn-success px-3 shadow-sm btn-action w-100 w-sm-auto">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nuevo Usuario</span>
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(usuarios)}" class="card shadow-sm border-0 text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+            <h5 class="fw-semibold mt-3 mb-1">No hay usuarios registrados</h5>
+            <p class="text-muted small">Crea una nueva cuenta de usuario desde el botón superior.</p>
+        </div>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(usuarios)}">
+        <div class="d-md-none">
+            <div th:each="u : ${usuarios}" class="card shadow-sm border-0 mb-3">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img th:src="${u.foto != null && !u.foto.isEmpty() ? u.foto : 'https://placehold.co/60x60?text=U'}"
+                             class="rounded-circle border" width="55" height="55" style="object-fit: cover;">
+                        <div class="flex-grow-1 overflow-hidden">
+                            <h6 class="fw-bold mb-1 text-truncate" th:text="${u.nombre}"></h6>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" th:text="${u.rol}"></span>
+                        </div>
+                    </div>
+
+                    <div class="small bg-light p-2 rounded mb-3">
+                        <div class="text-truncate mb-1">
+                            <i class="bi bi-envelope text-secondary me-1"></i>
+                            <span class="text-dark" th:text="${u.email}"></span>
+                        </div>
+                        <div>
+                            <i class="bi bi-telephone text-secondary me-1"></i>
+                            <span class="text-dark" th:text="${u.telefono != null && !u.telefono.isEmpty() ? u.telefono : 'Sin teléfono'}"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn btn-outline-primary btn-sm flex-fill btn-action">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}"
+                           class="btn btn-outline-danger btn-sm flex-fill btn-action"
+                           onclick="return confirm('¿Desea eliminar este usuario?');">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 d-none d-md-block overflow-hidden">
+            <div class="table-responsive mb-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3" style="width: 70px;">Perfil</th>
+                        <th>Nombre</th>
+                        <th>Correo Electrónico</th>
+                        <th>Teléfono</th>
+                        <th>Rol Asignado</th>
+                        <th class="text-end pe-4" style="width: 200px;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${usuarios}">
+                        <td class="ps-3">
+                            <img th:src="${u.foto != null && !u.foto.isEmpty() ? u.foto : 'https://placehold.co/45x45?text=U'}"
+                                 class="rounded-circle border shadow-sm" width="42" height="42" style="object-fit: cover;">
+                        </td>
+                        <td class="fw-semibold text-dark" th:text="${u.nombre}"></td>
+                        <td class="text-muted" th:text="${u.email}"></td>
+                        <td class="text-muted" th:text="${u.telefono != null && !u.telefono.isEmpty() ? u.telefono : '-'}"></td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" th:text="${u.rol}"></span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-inline-flex gap-2">
+                                <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn btn-sm btn-outline-primary btn-action px-2 py-1">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}"
+                                   class="btn btn-sm btn-outline-danger btn-action px-2 py-1"
+                                   onclick="return confirm('¿Desea eliminar este usuario?');">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

@@ -21,18 +21,17 @@ public class LoginController {
 
     @GetMapping("/login")
     public String mostrarLogin(HttpSession session) {
-        // Si ya está logueado, redirige directo a la lista de usuarios
         if (session.getAttribute("usuarioLogueado") != null) {
-            return "redirect:/usuarios";
+            return "redirect:/dashboard";
         }
         return "login/login";
     }
 
     @PostMapping("/login")
     public String procesarLogin(@RequestParam("email") String email,
-            @RequestParam("password") String password,
-            HttpSession session,
-            Model model) {
+                                @RequestParam("password") String password,
+                                HttpSession session,
+                                Model model) {
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
@@ -41,14 +40,13 @@ public class LoginController {
 
             if (usuario.getPassword() != null && usuario.getPassword().equals(password)) {
 
-                if (Boolean.FALSE.equals(usuario.getActivo())) {
+                if (!usuario.isActivo()) {
                     model.addAttribute("error", "Tu cuenta se encuentra desactivada.");
                     return "login/login";
                 }
 
                 session.setAttribute("usuarioLogueado", usuario);
-
-                return "redirect:/usuarios";
+                return "redirect:/dashboard";
             }
         }
 
