@@ -32,9 +32,9 @@ public class DashboardController {
         }
 
         model.addAttribute("usuario", usuario);
-        model.addAttribute("totalUsuarios", usuarioRepository.count());
-        model.addAttribute("totalComplejos", complejoRepositorio.count());
-        model.addAttribute("totalCanchas", canchaRepository.count());
+        model.addAttribute("totalUsuarios", usuarioRepository.countByActivoTrue());
+        model.addAttribute("totalComplejos", complejoRepositorio.countByActivoTrue());
+        model.addAttribute("totalCanchas", canchaRepository.countByActivoTrue());
 
         return "dashboard";
     }

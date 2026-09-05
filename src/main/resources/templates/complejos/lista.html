@@ -41,7 +41,7 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${usuarioLogueado.rol == 'ADMIN_SISTEMA'}">
                     <a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people-fill me-1"></i>Usuarios</a>
                 </li>
             </ul>
@@ -60,7 +60,7 @@
             <h2 class="fw-bold mb-1 text-dark">Gestión de Complejos</h2>
             <p class="text-muted small mb-0">Listado de recintos deportivos registrados</p>
         </div>
-        <div class="col-12 col-sm-5 col-md-4 text-sm-end">
+        <div class="col-12 col-sm-5 col-md-4 text-sm-end" th:if="${usuarioLogueado.rol != 'CLIENTE'}">
             <a th:href="@{/complejos/nuevo}" class="btn btn-success px-3 shadow-sm btn-action w-100 w-sm-auto">
                 <i class="bi bi-plus-lg"></i>
                 <span>Nuevo Complejo</span>
@@ -99,10 +99,10 @@
                         <a th:href="@{/canchas/complejo/{id}(id=${c.id_complejo})}" class="btn btn-outline-info btn-sm flex-fill btn-action">
                             <i class="bi bi-grid"></i> Canchas
                         </a>
-                        <a th:href="@{/complejos/editar/{id}(id=${c.id_complejo})}" class="btn btn-outline-primary btn-sm flex-fill btn-action">
+                        <a th:if="${usuarioLogueado.rol != 'CLIENTE'}" th:href="@{/complejos/editar/{id}(id=${c.id_complejo})}" class="btn btn-outline-primary btn-sm flex-fill btn-action">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
-                        <a th:href="@{/complejos/eliminar/{id}(id=${c.id_complejo})}" class="btn btn-outline-danger btn-sm flex-fill btn-action" onclick="return confirm('¿Desea eliminar este complejo?');">
+                        <a th:if="${usuarioLogueado.rol != 'CLIENTE'}" th:href="@{/complejos/eliminar/{id}(id=${c.id_complejo})}" class="btn btn-outline-danger btn-sm flex-fill btn-action" onclick="return confirm('¿Desea eliminar este complejo?');">
                             <i class="bi bi-trash"></i> Eliminar
                         </a>
                     </div>
@@ -138,10 +138,10 @@
                                 <a th:href="@{/canchas/complejo/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-info btn-action px-2 py-1" title="Ver Canchas">
                                     <i class="bi bi-grid"></i> Canchas
                                 </a>
-                                <a th:href="@{/complejos/editar/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-primary btn-action px-2 py-1">
+                                <a th:if="${usuarioLogueado.rol != 'CLIENTE'}" th:href="@{/complejos/editar/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-primary btn-action px-2 py-1">
                                     <i class="bi bi-pencil"></i> Editar
                                 </a>
-                                <a th:href="@{/complejos/eliminar/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-danger btn-action px-2 py-1" onclick="return confirm('¿Desea eliminar este complejo?');">
+                                <a th:if="${usuarioLogueado.rol != 'CLIENTE'}" th:href="@{/complejos/eliminar/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-danger btn-action px-2 py-1" onclick="return confirm('¿Desea eliminar este complejo?');">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </a>
                             </div>

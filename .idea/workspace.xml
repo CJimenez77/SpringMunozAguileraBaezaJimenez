@@ -5,29 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3d426ff-6a13-435d-b485-2ed9bb8c676c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/DashboardController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/9.7.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.7.1/checksums/checksums.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/login/registro.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.7.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.7.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.7.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.7.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.7.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.7.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.7.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.7.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.7.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.7.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/CanchaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/CanchaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/ComplejoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/ComplejoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/DashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/DashboardController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/canchas/formulario.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/canchas/formulario.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/model/Cancha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/model/Cancha.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/model/Complejo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/model/Complejo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/repository/CanchaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/repository/CanchaRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/repository/ComplejoRepositorio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/repository/ComplejoRepositorio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cl/jimenez/munoz/aguilera/baeza/proyectosemestral/repository/UsuarioRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/canchas/lista.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/canchas/lista.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/complejos/formulario.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/complejos/formulario.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/complejos/lista.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/complejos/lista.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/login/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/login/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/usuarios/formulario.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/usuarios/formulario.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/usuarios/lista.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/usuarios/lista.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +72,8 @@
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/cristianj/Documentos/WebOO/SpringMunozAguileraBaezaJimenez",
+    "node.js.detected.package.jshint": "true",
+    "node.js.selected.package.jshint": "",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
   }

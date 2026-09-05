@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "complejos")
 public class Complejo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_complejo;
@@ -18,43 +19,33 @@ public class Complejo {
     @Column(columnDefinition = "TEXT")
     private String ubicacionMapa;
 
-    public Complejo(){}
+    @Column(nullable = false)
+    private boolean activo = true;
 
-    public Complejo(String nombre_complejo, String direccion_complejo, String ubicacionMapa) {
+    @ManyToOne
+    @JoinColumn(name = "id_dueno")
+    private Usuario dueno;
+
+    public Complejo() {}
+
+    public Complejo(String nombre_complejo, String direccion_complejo, String ubicacionMapa, Usuario dueno) {
         this.nombre_complejo = nombre_complejo;
         this.direccion_complejo = direccion_complejo;
         this.ubicacionMapa = ubicacionMapa;
+        this.dueno = dueno;
+        this.activo = true;
     }
 
-    public Long getId_complejo() {
-        return id_complejo;
-    }
-
-    public void setId_complejo(Long id_complejo) {
-        this.id_complejo = id_complejo;
-    }
-
-    public String getNombre_complejo() {
-        return nombre_complejo;
-    }
-
-    public void setNombre_complejo(String nombre_complejo) {
-        this.nombre_complejo = nombre_complejo;
-    }
-
-    public String getDireccion_complejo() {
-        return direccion_complejo;
-    }
-
-    public void setDireccion_complejo(String direccion_complejo) {
-        this.direccion_complejo = direccion_complejo;
-    }
-
-    public String getUbicacionMapa() {
-        return ubicacionMapa;
-    }
-
-    public void setUbicacionMapa(String ubicacionMapa) {
-        this.ubicacionMapa = ubicacionMapa;
-    }
+    public Long getId_complejo() { return id_complejo; }
+    public void setId_complejo(Long id_complejo) { this.id_complejo = id_complejo; }
+    public String getNombre_complejo() { return nombre_complejo; }
+    public void setNombre_complejo(String nombre_complejo) { this.nombre_complejo = nombre_complejo; }
+    public String getDireccion_complejo() { return direccion_complejo; }
+    public void setDireccion_complejo(String direccion_complejo) { this.direccion_complejo = direccion_complejo; }
+    public String getUbicacionMapa() { return ubicacionMapa; }
+    public void setUbicacionMapa(String ubicacionMapa) { this.ubicacionMapa = ubicacionMapa; }
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
+    public Usuario getDueno() { return dueno; }
+    public void setDueno(Usuario dueno) { this.dueno = dueno; }
 }

@@ -48,7 +48,7 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
                     <a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people-fill me-1"></i>Usuarios</a>
                 </li>
             </ul>
@@ -70,7 +70,6 @@
 </nav>
 
 <div class="container py-4 py-md-5">
-
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4 pb-2 border-bottom">
         <div>
             <h2 class="fw-bold text-dark mb-1">
@@ -78,7 +77,12 @@
             </h2>
             <p class="text-muted small mb-0">Panel central de administración y gestión de canchas.</p>
         </div>
-        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill" th:text="'Modo: ' + ${usuario.rol}"></span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill" th:text="'Modo: ' + ${usuario.rol}"></span>
+            <a th:if="${usuario.rol == 'CLIENTE'}" th:href="@{/usuarios/dar-de-baja}" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar tu cuenta? Podrás contactar al administrador si necesitas reactivarla.');">
+                <i class="bi bi-person-x"></i> Eliminar mi cuenta
+            </a>
+        </div>
     </div>
 
     <div class="row g-3 mb-4">
@@ -108,7 +112,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-4">
+        <div class="col-12 col-sm-4" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body d-flex align-items-center justify-content-between p-3">
                     <div>
@@ -125,7 +129,6 @@
 
     <h5 class="fw-bold text-dark mb-3">Módulos del Sistema</h5>
     <div class="row g-3">
-
         <div class="col-12 col-md-4">
             <div class="card shadow-sm border-0 h-100 module-card">
                 <div class="card-body p-4 d-flex flex-column">
@@ -133,10 +136,10 @@
                         <i class="bi bi-geo-alt fs-4"></i>
                     </div>
                     <h5 class="fw-bold text-dark">Complejos Deportivos</h5>
-                    <p class="text-muted small flex-grow-1">Administra los recintos deportivos, direcciones físicas y geolocalización en mapa.</p>
+                    <p class="text-muted small flex-grow-1">Consulta los recintos deportivos, direcciones físicas y geolocalización en mapa.</p>
                     <div class="d-flex gap-2 mt-3 pt-3 border-top">
                         <a th:href="@{/complejos}" class="btn btn-outline-success btn-sm flex-fill">Ver lista</a>
-                        <a th:href="@{/complejos/nuevo}" class="btn btn-success btn-sm" title="Nuevo Complejo"><i class="bi bi-plus-lg"></i></a>
+                        <a th:if="${usuario.rol != 'CLIENTE'}" th:href="@{/complejos/nuevo}" class="btn btn-success btn-sm" title="Nuevo Complejo"><i class="bi bi-plus-lg"></i></a>
                     </div>
                 </div>
             </div>
@@ -149,16 +152,16 @@
                         <i class="bi bi-grid-3x3-gap fs-4"></i>
                     </div>
                     <h5 class="fw-bold text-dark">Gestión de Canchas</h5>
-                    <p class="text-muted small flex-grow-1">Controla las canchas por complejo, tipo de deporte y tarifas por hora.</p>
+                    <p class="text-muted small flex-grow-1">Revisa la disponibilidad de canchas, tipos de deporte y tarifas vigentes.</p>
                     <div class="d-flex gap-2 mt-3 pt-3 border-top">
                         <a th:href="@{/canchas}" class="btn btn-outline-info btn-sm flex-fill">Ver canchas</a>
-                        <a th:href="@{/canchas/nuevo}" class="btn btn-info text-white btn-sm" title="Nueva Cancha"><i class="bi bi-plus-lg"></i></a>
+                        <a th:if="${usuario.rol != 'CLIENTE'}" th:href="@{/canchas/nuevo}" class="btn btn-info text-white btn-sm" title="Nueva Cancha"><i class="bi bi-plus-lg"></i></a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-4" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
             <div class="card shadow-sm border-0 h-100 module-card">
                 <div class="card-body p-4 d-flex flex-column">
                     <div class="stat-icon bg-primary text-white mb-3">
@@ -173,7 +176,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
