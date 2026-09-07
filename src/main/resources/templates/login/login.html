@@ -43,6 +43,9 @@
     <div th:if="${param.desactivada}" class="alert alert-warning py-2 small text-center" role="alert">
         Tu cuenta ha sido dada de baja correctamente.
     </div>
+    <div th:if="${param.claveCambiada}" class="alert alert-success py-2 small text-center" role="alert">
+        Contraseña actualizada exitosamente. Ya puedes iniciar sesión con tu nueva clave.
+    </div>
 
     <form th:action="@{/login}" method="post">
         <div class="mb-3">
@@ -59,7 +62,10 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="******" required>
             </div>
         </div>
-        <div class="d-grid mt-4">
+        <div class="d-flex justify-content-end mb-3">
+            <a th:href="@{/recuperar-password}" class="text-decoration-none small text-primary">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div class="d-grid mt-2">
             <button type="submit" class="btn btn-primary fw-semibold py-2 shadow-sm">
                 Ingresar al Portal
             </button>

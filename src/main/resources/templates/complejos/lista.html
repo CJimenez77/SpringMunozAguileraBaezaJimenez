@@ -115,21 +115,24 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-dark">
                     <tr>
-                        <th class="ps-3" style="width: 70px;">ID</th>
+                        <th class="ps-3" style="width: 70px;">Foto</th>
                         <th>Nombre</th>
                         <th>Dirección</th>
                         <th>Ubicación</th>
-                        <th class="text-end pe-4" style="width: 250px;">Acciones</th>
+                        <th class="text-end pe-4" style="width: 320px;">Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="c : ${complejos}">
-                        <td class="ps-3 fw-semibold text-muted" th:text="${c.id_complejo}"></td>
+                        <td class="ps-3">
+                            <img th:src="${c.foto != null && !c.foto.isEmpty() ? c.foto : 'https://placehold.co/60x40?text=Recinto'}"
+                                 class="rounded border shadow-sm" width="55" height="40" style="object-fit: cover;">
+                        </td>
                         <td class="fw-bold" th:text="${c.nombre_complejo}"></td>
                         <td class="text-muted" th:text="${c.direccion_complejo}"></td>
                         <td>
                             <a th:if="${c.ubicacionMapa != null && !c.ubicacionMapa.isEmpty()}" th:href="${c.ubicacionMapa}" target="_blank" class="btn btn-sm btn-light border btn-action">
-                                <i class="bi bi-box-arrow-up-right"></i> Ver mapa
+                                <i class="bi bi-geo-alt-fill text-danger"></i> Ver mapa
                             </a>
                             <span class="text-muted small" th:if="${c.ubicacionMapa == null || c.ubicacionMapa.isEmpty()}">-</span>
                         </td>
@@ -137,6 +140,9 @@
                             <div class="d-inline-flex gap-2">
                                 <a th:href="@{/canchas/complejo/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-info btn-action px-2 py-1" title="Ver Canchas">
                                     <i class="bi bi-grid"></i> Canchas
+                                </a>
+                                <a th:if="${usuarioLogueado.rol != 'CLIENTE'}" th:href="@{/complejos/{id}/servicios(id=${c.id_complejo})}" class="btn btn-sm btn-outline-secondary btn-action px-2 py-1" title="Servicios Adicionales">
+                                    <i class="bi bi-gear"></i> Servicios
                                 </a>
                                 <a th:if="${usuarioLogueado.rol != 'CLIENTE'}" th:href="@{/complejos/editar/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-primary btn-action px-2 py-1">
                                     <i class="bi bi-pencil"></i> Editar
