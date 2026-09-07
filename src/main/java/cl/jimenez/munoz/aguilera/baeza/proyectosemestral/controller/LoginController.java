@@ -20,6 +20,9 @@ public class LoginController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.PasswordResetService passwordResetService;
+
     @GetMapping("/login")
     public String mostrarLogin(HttpSession session) {
         if (session.getAttribute("usuarioLogueado") != null) {
@@ -77,5 +80,55 @@ public class LoginController {
         usuario.setActivo(true);
         usuarioRepository.save(usuario);
         return "redirect:/login?registrado";
+    }
+
+    @GetMapping("/recuperar-password")
+    public String mostrarRecuperarPassword() {
+        return "login/recuperar-password";
+    }
+
+    @PostMapping("/recuperar-password")
+    public String procesarRecuperarPassword(@RequestParam("email") String email,
+                                            jakarta.servlet.http.HttpServletRequest request,
+                                            Model model) {
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        boolean enviado = passwordResetService.solicitarRecuperacion(email, baseUrl);
+        if (enviado) {
+            model.addAttribute("exito", "Se ha enviado un enlace de recuperación a tu correo electrónico.");
+        } else {
+            model.addAttribute("error", "No encontramos ninguna cuenta asociada a ese correo.");
+        }
+        return "login/recuperar-password";
+    }
+
+    @GetMapping("/restablecer-password")
+    public String mostrarRestablecerPassword(@RequestParam("token") String token, Model model) {
+        Optional<Usuario> usuarioOpt = passwordResetService.validarToken(token);
+        if (usuarioOpt.isEmpty()) {
+            model.addAttribute("tokenInvalido", true);
+        } else {
+            model.addAttribute("token", token);
+        }
+        return "login/restablecer-password";
+    }
+
+    @PostMapping("/restablecer-password")
+    public String procesarRestablecerPassword(@RequestParam("token") String token,
+                                              @RequestParam("password") String password,
+                                              @RequestParam("confirmarPassword") String confirmarPassword,
+                                              Model model) {
+        if (!password.equals(confirmarPassword)) {
+            model.addAttribute("error", "Las contraseñas no coinciden.");
+            model.addAttribute("token", token);
+            return "login/restablecer-password";
+        }
+        boolean exito = passwordResetService.restablecerPassword(token, password);
+        if (exito) {
+            return "redirect:/login?claveCambiada";
+        } else {
+            model.addAttribute("error", "El enlace ha expirado o es inválido.");
+            model.addAttribute("tokenInvalido", true);
+            return "login/restablecer-password";
+        }
     }
 }

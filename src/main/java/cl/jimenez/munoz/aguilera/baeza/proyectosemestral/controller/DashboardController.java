@@ -15,13 +15,16 @@ public class DashboardController {
     private final UsuarioRepository usuarioRepository;
     private final ComplejoRepositorio complejoRepositorio;
     private final CanchaRepository canchaRepository;
+    private final cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository reservaRepository;
 
     public DashboardController(UsuarioRepository usuarioRepository,
                                ComplejoRepositorio complejoRepositorio,
-                               CanchaRepository canchaRepository) {
+                               CanchaRepository canchaRepository,
+                               cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository reservaRepository) {
         this.usuarioRepository = usuarioRepository;
         this.complejoRepositorio = complejoRepositorio;
         this.canchaRepository = canchaRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     @GetMapping({"/", "/dashboard"})
@@ -35,6 +38,7 @@ public class DashboardController {
         model.addAttribute("totalUsuarios", usuarioRepository.countByActivoTrue());
         model.addAttribute("totalComplejos", complejoRepositorio.countByActivoTrue());
         model.addAttribute("totalCanchas", canchaRepository.countByActivoTrue());
+        model.addAttribute("totalReservas", reservaRepository.count());
 
         return "dashboard";
     }
