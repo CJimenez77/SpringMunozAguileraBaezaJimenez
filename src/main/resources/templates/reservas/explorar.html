@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorar Canchas Deportivas - CanchasYa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .court-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .court-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .court-img {
+            height: 190px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
+                <i class="bi bi-trophy-fill text-warning"></i>
+                <span>CanchasYa</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar
+                            Canchas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/reservas/mis-reservas}"><i
+                                class="bi bi-calendar-check me-1"></i>Mis Reservas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2" th:if="${usuarioLogueado != null}">
+                    <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </div>
+                <div th:if="${usuarioLogueado == null}">
+                    <a th:href="@{/login}" class="btn btn-primary btn-sm">Iniciar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4 py-md-5">
+        <div class="mb-4">
+            <h2 class="fw-bold text-dark mb-1">Encuentra y Reserva tu Cancha</h2>
+            <p class="text-muted small mb-0">Filtra por disciplina deportiva, recinto, tarifas o calificación</p>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4 p-3 bg-white">
+            <form th:action="@{/explorar}" method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label small fw-semibold">Búsqueda / Recinto / Dirección</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" name="busqueda" th:value="${busquedaFiltro}"
+                            placeholder="Nombre de cancha, complejo o calle...">
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-semibold">Deporte</label>
+                    <select class="form-select" name="deporte">
+                        <option value="">Todos los deportes</option>
+                        <option value="Fútbol" th:selected="${deporteFiltro == 'Fútbol'}">Fútbol</option>
+                        <option value="Pádel" th:selected="${deporteFiltro == 'Pádel'}">Pádel</option>
+                        <option value="Tenis" th:selected="${deporteFiltro == 'Tenis'}">Tenis</option>
+                        <option value="Básquetbol" th:selected="${deporteFiltro == 'Básquetbol'}">Básquetbol</option>
+                        <option value="Vóleibol" th:selected="${deporteFiltro == 'Vóleibol'}">Vóleibol</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold">Precio Máximo / hr</label>
+                    <input type="number" class="form-control" name="precioMax" th:value="${precioMaxFiltro}"
+                        placeholder="Ej: 30000" step="1000">
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold">Calificación Mín.</label>
+                    <select class="form-select" name="calificacionMin">
+                        <option value="">Cualquiera</option>
+                        <option value="4" th:selected="${calificacionMinFiltro == 4}">4 estrellas o más</option>
+                        <option value="3" th:selected="${calificacionMinFiltro == 3}">3 estrellas o más</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-1 d-grid">
+                    <button type="submit" class="btn btn-primary shadow-sm" title="Filtrar">
+                        <i class="bi bi-funnel-fill"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div th:if="${#lists.isEmpty(canchas)}" class="card shadow-sm border-0 text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-emoji-neutral text-muted" style="font-size: 3rem;"></i>
+                <h5 class="fw-semibold mt-3 mb-1">No se encontraron canchas con esos filtros</h5>
+                <p class="text-muted small">Prueba quitando algunos criterios de búsqueda para ver más opciones.</p>
+                <a th:href="@{/explorar}" class="btn btn-outline-primary btn-sm">Restablecer filtros</a>
+            </div>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(canchas)}" class="row g-4">
+            <div class="col-12 col-md-6 col-lg-4" th:each="c : ${canchas}">
+                <div class="card h-100 shadow-sm border-0 court-card bg-white">
+                    <img th:src="${c.foto != null && !c.foto.isEmpty() ? c.foto : 'https://placehold.co/400x240?text=' + c.tipo_cancha}"
+                        class="court-img" th:alt="${c.nombre_cancha}">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"
+                                th:text="${c.tipo_cancha}"></span>
+                            <div class="rating-stars d-flex align-items-center gap-1">
+                                <i class="bi bi-star-fill"></i>
+                                <span class="text-dark fw-bold small"
+                                    th:text="${promedios.get(c.id_cancha) > 0 ? promedios.get(c.id_cancha) : 'Nuevo'}"></span>
+                                <span class="text-muted small" th:if="${conteos.get(c.id_cancha) > 0}"
+                                    th:text="'(' + ${conteos.get(c.id_cancha)} + ')'"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-1" th:text="${c.nombre_cancha}"></h5>
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-building me-1 text-secondary"></i>
+                            <span class="fw-semibold" th:text="${c.complejo.nombre_complejo}"></span>
+                        </div>
+                        <div class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt me-1 text-secondary"></i>
+                            <span th:text="${c.complejo.direccion_complejo}"></span>
+                        </div>
+
+                        <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small d-block">Desde</span>
+                                <span class="fw-bold text-success fs-5"
+                                    th:text="'$' + ${#numbers.formatInteger(c.precio_hora, 3, 'POINT')}"></span>
+                                <span class="text-muted small">/hr</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a th:if="${c.complejo.ubicacionMapa != null && !c.complejo.ubicacionMapa.isEmpty()}"
+                                    th:href="${c.complejo.ubicacionMapa}" target="_blank"
+                                    class="btn btn-outline-secondary btn-sm" title="Ver en Google Maps">
+                                    <i class="bi bi-geo-alt-fill text-danger"></i>
+                                </a>
+                                <a th:href="@{/reservas/crear(canchaId=${c.id_cancha})}"
+                                    class="btn btn-success btn-sm px-3 shadow-sm">
+                                    <i class="bi bi-calendar-check me-1"></i>Reservar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
