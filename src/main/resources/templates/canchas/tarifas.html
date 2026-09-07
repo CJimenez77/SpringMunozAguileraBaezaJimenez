@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precios por Franja Horaria - CanchasYa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .table > :not(caption) > * > * {
+            padding: 0.85rem 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
+            <i class="bi bi-trophy-fill text-warning"></i>
+            <span>CanchasYa</span>
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a th:href="@{/canchas}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Volver a Canchas
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4 py-md-5">
+    <div class="mb-4 pb-2 border-bottom">
+        <h2 class="fw-bold mb-1 text-dark">
+            Tarifas Especiales y Franjas Peak: <span class="text-primary" th:text="${cancha.nombre_cancha}"></span>
+        </h2>
+        <p class="text-muted small mb-0">
+            Tarifa base normal: <strong class="text-dark" th:text="'$' + ${#numbers.formatInteger(cancha.precio_hora, 3, 'POINT')} + ' / hr'"></strong>. Define precios dinámicos para horarios de alta demanda.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                    <h5 class="fw-bold mb-0 text-dark">Nueva Franja Horaria</h5>
+                    <p class="text-muted small mt-1 mb-0">Tarifa diferenciada (ej: horario peak)</p>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/canchas/{id}/tarifas/guardar(id=${cancha.id_cancha})}" th:object="${nuevaTarifa}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nombre de la Franja</label>
+                            <input type="text" class="form-control" th:field="*{nombre}" placeholder="Ej: Horario Peak Noche" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Día de Aplicación</label>
+                            <select class="form-select" th:field="*{diaSemana}">
+                                <option value="">Todos los días</option>
+                                <option value="1">Lunes</option>
+                                <option value="2">Martes</option>
+                                <option value="3">Miércoles</option>
+                                <option value="4">Jueves</option>
+                                <option value="5">Viernes</option>
+                                <option value="6">Sábado</option>
+                                <option value="7">Domingo</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Hora Inicio</label>
+                                <input type="time" class="form-control" th:field="*{horaInicio}" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Hora Fin</label>
+                                <input type="time" class="form-control" th:field="*{horaFin}" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Precio por Hora (CLP)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted">$</span>
+                                <input type="number" class="form-control" th:field="*{precioHora}" placeholder="Ej: 28000" min="0" step="500" required>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary fw-semibold shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i>Crear Franja Peak
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 px-4">
+                    <h5 class="fw-bold mb-0 text-dark">Franjas Configuradas</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div th:if="${#lists.isEmpty(tarifas)}" class="p-5 text-center text-muted">
+                        <i class="bi bi-clock-history fs-1 mb-2 d-block"></i>
+                        <p class="mb-0">No se han definido tarifas especiales para esta cancha. Se aplicará siempre la tarifa base.</p>
+                    </div>
+
+                    <div th:if="${!#lists.isEmpty(tarifas)}" class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Franja</th>
+                                <th>Día</th>
+                                <th>Horario</th>
+                                <th>Precio / Hora</th>
+                                <th class="text-end pe-4">Acción</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="t : ${tarifas}">
+                                <td class="ps-4 fw-semibold text-dark" th:text="${t.nombre}"></td>
+                                <td>
+                                    <span class="badge bg-secondary-subtle text-secondary border" th:text="${t.getNombreDia()}"></span>
+                                </td>
+                                <td class="text-muted small" th:text="${t.horaInicio} + ' - ' + ${t.horaFin}"></td>
+                                <td class="text-success fw-bold" th:text="'$' + ${#numbers.formatInteger(t.precioHora, 3, 'POINT')}"></td>
+                                <td class="text-end pe-4">
+                                    <a th:href="@{/canchas/{id}/tarifas/eliminar/{idT}(id=${cancha.id_cancha}, idT=${t.id})}"
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('¿Desea eliminar esta franja horaria?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
