@@ -22,6 +22,9 @@ public class Complejo {
     @Column(nullable = false)
     private boolean activo = true;
 
+    @Column(columnDefinition = "TEXT")
+    private String foto;
+
     @ManyToOne
     @JoinColumn(name = "id_dueno")
     private Usuario dueno;
@@ -48,4 +51,6 @@ public class Complejo {
     public void setActivo(boolean activo) { this.activo = activo; }
     public Usuario getDueno() { return dueno; }
     public void setDueno(Usuario dueno) { this.dueno = dueno; }
+    public String getFoto() { return foto; }
+    public void setFoto(String foto) { this.foto = foto; }
 }

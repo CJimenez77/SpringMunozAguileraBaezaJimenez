@@ -1,6 +1,7 @@
 package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios")
@@ -67,4 +68,15 @@ public class Usuario {
     public boolean isActivo() { return activo; }
     public boolean getActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
+
+    @Column(length = 100)
+    private String tokenRecuperacion;
+
+    private LocalDateTime tokenExpiracion;
+
+    public String getTokenRecuperacion() { return tokenRecuperacion; }
+    public void setTokenRecuperacion(String tokenRecuperacion) { this.tokenRecuperacion = tokenRecuperacion; }
+
+    public LocalDateTime getTokenExpiracion() { return tokenExpiracion; }
+    public void setTokenExpiracion(LocalDateTime tokenExpiracion) { this.tokenExpiracion = tokenExpiracion; }
 }

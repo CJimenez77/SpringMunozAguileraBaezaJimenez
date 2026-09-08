@@ -22,6 +22,9 @@ public class Cancha {
     @Column(nullable = false)
     private boolean activo = true;
 
+    @Column(columnDefinition = "TEXT")
+    private String foto;
+
     @ManyToOne
     @JoinColumn(name = "id_complejo", nullable = false)
     private Complejo complejo;
@@ -48,4 +51,6 @@ public class Cancha {
     public void setActivo(boolean activo) { this.activo = activo; }
     public Complejo getComplejo() { return complejo; }
     public void setComplejo(Complejo complejo) { this.complejo = complejo; }
+    public String getFoto() { return foto; }
+    public void setFoto(String foto) { this.foto = foto; }
 }
