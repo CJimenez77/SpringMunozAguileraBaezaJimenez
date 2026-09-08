@@ -1,0 +1,181 @@
+.theme-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(120, 130, 140, 0.25);
+    background-color: rgba(255, 255, 255, 0.75);
+    color: #495057;
+    backdrop-filter: blur(6px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    padding: 0;
+    line-height: 1;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.08);
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #212529;
+}
+
+.navbar .theme-toggle-btn {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #f8f9fa;
+}
+
+.navbar .theme-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .theme-toggle-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(33, 37, 41, 0.75);
+    color: #ffc107;
+}
+
+[data-bs-theme="dark"] .theme-toggle-btn:hover {
+    background-color: rgba(33, 37, 41, 0.95);
+    color: #ffca2c;
+}
+
+.theme-toggle-floating {
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 1090;
+}
+
+body {
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+[data-bs-theme="dark"] body {
+    background-color: #121417 !important;
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #16191d !important;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: #1e2227 !important;
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #1e2227 !important;
+    border-color: #2c3238 !important;
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .card-header,
+[data-bs-theme="dark"] .card-footer {
+    background-color: #171a1e !important;
+    border-color: #2c3238 !important;
+}
+
+[data-bs-theme="dark"] .table {
+    color: #e9ecef !important;
+    border-color: #2c3238 !important;
+}
+
+[data-bs-theme="dark"] .table > :not(caption) > * > * {
+    background-color: transparent !important;
+    border-bottom-color: #2c3238 !important;
+}
+
+[data-bs-theme="dark"] .table-hover > tbody > tr:hover > * {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #16191d !important;
+    border-color: #343a40 !important;
+    color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #16191d !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .input-group-text {
+    background-color: #23272c !important;
+    border-color: #343a40 !important;
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .list-group-item {
+    background-color: #1e2227 !important;
+    border-color: #2c3238 !important;
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: #1e2227 !important;
+    border-color: #2c3238 !important;
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .border,
+[data-bs-theme="dark"] .border-top,
+[data-bs-theme="dark"] .border-bottom,
+[data-bs-theme="dark"] .border-start,
+[data-bs-theme="dark"] .border-end {
+    border-color: #2c3238 !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #9aa0a6 !important;
+}
+
+[data-bs-theme="dark"] .text-secondary {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .slot-available {
+    background-color: #1e2227 !important;
+    border-color: #2c3238 !important;
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .slot-reserved {
+    background-color: #15181b !important;
+    border-color: #23272c !important;
+    color: #6c757d !important;
+}
+
+[data-bs-theme="dark"] .slot-selected {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .slot-peak {
+    background-color: #3d2400 !important;
+    border-color: #ff9800 !important;
+    color: #ffb74d !important;
+}
+
+[data-bs-theme="dark"] .slot-peak:hover {
+    background-color: #f57c00 !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .login-card {
+    background-color: #1e2227 !important;
+    border: 1px solid #2c3238 !important;
+}

@@ -4,6 +4,8 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.*;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.*;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.DisponibilidadService;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.ReservaService;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.WebpayService;
+import cl.transbank.webpay.webpayplus.responses.WebpayPlusTransactionCreateResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -27,19 +29,22 @@ public class ReservaController {
     private final ResenaRepository resenaRepository;
     private final DisponibilidadService disponibilidadService;
     private final ReservaService reservaService;
+    private final WebpayService webpayService;
 
     public ReservaController(ReservaRepository reservaRepository,
                              CanchaRepository canchaRepository,
                              ServicioAdicionalRepository servicioAdicionalRepository,
                              ResenaRepository resenaRepository,
                              DisponibilidadService disponibilidadService,
-                             ReservaService reservaService) {
+                             ReservaService reservaService,
+                             WebpayService webpayService) {
         this.reservaRepository = reservaRepository;
         this.canchaRepository = canchaRepository;
         this.servicioAdicionalRepository = servicioAdicionalRepository;
         this.resenaRepository = resenaRepository;
         this.disponibilidadService = disponibilidadService;
         this.reservaService = reservaService;
+        this.webpayService = webpayService;
     }
 
     @GetMapping("/crear")
@@ -90,7 +95,7 @@ public class ReservaController {
         return ResponseEntity.ok(bloques);
     }
 
-    @PostMapping("/guardar")
+    @PostMapping({"/guardar", "/crear"})
     public String procesarReserva(
             @RequestParam("canchaId") Long canchaId,
             @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
@@ -100,7 +105,8 @@ public class ReservaController {
             @RequestParam(value = "recurrente", defaultValue = "false") boolean recurrente,
             @RequestParam(value = "semanasRecurrencia", defaultValue = "1") int semanasRecurrencia,
             HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
@@ -120,19 +126,33 @@ public class ReservaController {
         }
 
         try {
+            Reserva reserva;
             if (recurrente && semanasRecurrencia > 1) {
                 List<Reserva> reservas = reservaService.crearReservasRecurrentes(
                         usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, semanasRecurrencia
                 );
-                return "redirect:/pagos/webpay/" + reservas.get(0).getId() + "?grupo=" + reservas.get(0).getGrupoRecurrente();
+                reserva = reservas.get(0);
             } else {
-                Reserva reserva = reservaService.crearReserva(
+                reserva = reservaService.crearReserva(
                         usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, null
                 );
-                return "redirect:/pagos/webpay/" + reserva.getId();
             }
+
+            String buyOrder = "ORD-" + reserva.getId() + "-" + System.currentTimeMillis() % 10000;
+            String sessionId = "SES-" + reserva.getId();
+            double monto = reserva.getPrecioTotal();
+
+            WebpayPlusTransactionCreateResponse response = webpayService.iniciarPago(buyOrder, sessionId, monto);
+
+            model.addAttribute("url", response.getUrl());
+            model.addAttribute("tokenWs", response.getToken());
+            return "reservas/redireccion_webpay";
+
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/reservas/crear?canchaId=" + canchaId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al conectar con Webpay: " + e.getMessage());
             return "redirect:/reservas/crear?canchaId=" + canchaId;
         }
     }

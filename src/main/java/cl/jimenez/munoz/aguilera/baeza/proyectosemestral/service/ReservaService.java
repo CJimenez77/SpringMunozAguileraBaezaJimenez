@@ -1,6 +1,7 @@
 package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service;
 
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.*;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.PagoRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,24 +18,24 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final DisponibilidadService disponibilidadService;
     private final TarifaService tarifaService;
-    private final WebpaySandboxService webpaySandboxService;
+    private final PagoRepository pagoRepository;
     private final EmailService emailService;
 
     public ReservaService(ReservaRepository reservaRepository,
-            DisponibilidadService disponibilidadService,
-            TarifaService tarifaService,
-            WebpaySandboxService webpaySandboxService,
-            EmailService emailService) {
+                          DisponibilidadService disponibilidadService,
+                          TarifaService tarifaService,
+                          PagoRepository pagoRepository,
+                          EmailService emailService) {
         this.reservaRepository = reservaRepository;
         this.disponibilidadService = disponibilidadService;
         this.tarifaService = tarifaService;
-        this.webpaySandboxService = webpaySandboxService;
+        this.pagoRepository = pagoRepository;
         this.emailService = emailService;
     }
 
     @Transactional
     public Reserva crearReserva(Usuario usuario, Cancha cancha, LocalDate fecha, LocalTime horaInicio,
-            int duracionMinutos, List<ServicioAdicional> servicios, String grupoRecurrente) {
+                                int duracionMinutos, List<ServicioAdicional> servicios, String grupoRecurrente) {
 
         if (!disponibilidadService.validarDisponibilidad(cancha, fecha, horaInicio, duracionMinutos)) {
             throw new IllegalArgumentException("El horario seleccionado no se encuentra disponible.");
@@ -64,15 +65,13 @@ public class ReservaService {
             reserva.setServicios(new ArrayList<>(servicios));
         }
 
-        Reserva guardada = reservaRepository.save(reserva);
-        webpaySandboxService.iniciarTransaccion(guardada, "WEBPAY_PLUS");
-        return guardada;
+        return reservaRepository.save(reserva);
     }
 
     @Transactional
     public List<Reserva> crearReservasRecurrentes(Usuario usuario, Cancha cancha, LocalDate fechaInicio,
-            LocalTime horaInicio, int duracionMinutos,
-            List<ServicioAdicional> servicios, int semanasRecurrencia) {
+                                                  LocalTime horaInicio, int duracionMinutos,
+                                                  List<ServicioAdicional> servicios, int semanasRecurrencia) {
 
         for (int i = 0; i < semanasRecurrencia; i++) {
             LocalDate fechaObjetivo = fechaInicio.plusWeeks(i);
@@ -86,8 +85,7 @@ public class ReservaService {
 
         for (int i = 0; i < semanasRecurrencia; i++) {
             LocalDate fechaObjetivo = fechaInicio.plusWeeks(i);
-            Reserva r = crearReserva(usuario, cancha, fechaObjetivo, horaInicio, duracionMinutos, servicios,
-                    grupoRecurrente);
+            Reserva r = crearReserva(usuario, cancha, fechaObjetivo, horaInicio, duracionMinutos, servicios, grupoRecurrente);
             creadas.add(r);
         }
 
@@ -112,14 +110,17 @@ public class ReservaService {
         }
 
         if (!esAdmin && !reserva.esCancelable()) {
-            throw new IllegalStateException(
-                    "Las cancelaciones solo se permiten con al menos 24 horas de anticipación.");
+            throw new IllegalStateException("Las cancelaciones solo se permiten con al menos 24 horas de anticipación.");
         }
 
         reserva.setEstado("CANCELADA");
         reservaRepository.save(reserva);
 
-        webpaySandboxService.reembolsarPago(reserva);
+        pagoRepository.findByReserva(reserva).ifPresent(pago -> {
+            pago.setEstado("REEMBOLSADO");
+            pagoRepository.save(pago);
+        });
+
         emailService.enviarCancelacionReserva(reserva);
 
         return true;

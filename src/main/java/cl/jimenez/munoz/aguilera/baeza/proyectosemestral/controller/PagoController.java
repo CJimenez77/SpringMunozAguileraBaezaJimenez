@@ -5,12 +5,13 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Reserva;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.PagoRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository;
-import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.WebpaySandboxService;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.WebpayService;
+import cl.transbank.webpay.webpayplus.responses.WebpayPlusTransactionCreateResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,14 +21,17 @@ public class PagoController {
 
     private final ReservaRepository reservaRepository;
     private final PagoRepository pagoRepository;
-    private final WebpaySandboxService webpaySandboxService;
+    private final WebpayService webpayService;
+
+    @Value("${transbank.webpay.commerce-code:597055555532}")
+    private String codigoComercio;
 
     public PagoController(ReservaRepository reservaRepository,
                           PagoRepository pagoRepository,
-                          WebpaySandboxService webpaySandboxService) {
+                          WebpayService webpayService) {
         this.reservaRepository = reservaRepository;
         this.pagoRepository = pagoRepository;
-        this.webpaySandboxService = webpaySandboxService;
+        this.webpayService = webpayService;
     }
 
     @GetMapping("/webpay/{reservaId}")
@@ -45,74 +49,24 @@ public class PagoController {
             return "redirect:/reservas/mis-reservas";
         }
 
-        int totalPagar = reserva.getPrecioTotal();
-        if (grupo != null && !grupo.isEmpty()) {
-            List<Reserva> grupoReservas = reservaRepository.findByGrupoRecurrente(grupo);
-            totalPagar = grupoReservas.stream().mapToInt(Reserva::getPrecioTotal).sum();
-        }
-
-        model.addAttribute("reserva", reserva);
-        model.addAttribute("totalPagar", totalPagar);
-        model.addAttribute("grupo", grupo);
-        model.addAttribute("codigoComercio", WebpaySandboxService.CODIGO_COMERCIO);
-        model.addAttribute("usuarioLogueado", usuario);
-
-        return "pagos/webpay";
-    }
-
-    @PostMapping("/webpay/procesar")
-    public String procesarWebpay(@RequestParam("reservaId") Long reservaId,
-                                 @RequestParam(value = "grupo", required = false) String grupo,
-                                 @RequestParam("numeroTarjeta") String numeroTarjeta,
-                                 @RequestParam("mesVencimiento") String mesVencimiento,
-                                 @RequestParam("anioVencimiento") String anioVencimiento,
-                                 @RequestParam("cvv") String cvv,
-                                 @RequestParam(value = "tipoTarjeta", defaultValue = "Crédito / Débito") String tipoTarjeta,
-                                 RedirectAttributes redirectAttributes) {
-
-        Pago pago = webpaySandboxService.procesarPagoWebpay(reservaId, numeroTarjeta, mesVencimiento, anioVencimiento, cvv, tipoTarjeta);
-        if (pago == null) {
-            redirectAttributes.addFlashAttribute("error", "Error al procesar la transacción.");
-            return "redirect:/reservas/mis-reservas";
-        }
-
-        if ("PAGADO".equals(pago.getEstado())) {
+        try {
+            String buyOrder = "ORD-" + reserva.getId() + "-" + System.currentTimeMillis() % 10000;
+            String sessionId = "SES-" + reserva.getId();
+            double totalPagar = reserva.getPrecioTotal();
             if (grupo != null && !grupo.isEmpty()) {
                 List<Reserva> grupoReservas = reservaRepository.findByGrupoRecurrente(grupo);
-                for (Reserva r : grupoReservas) {
-                    r.setEstado("CONFIRMADA");
-                    reservaRepository.save(r);
-                }
+                totalPagar = grupoReservas.stream().mapToInt(Reserva::getPrecioTotal).sum();
             }
-            return "redirect:/pagos/comprobante/" + pago.getId();
-        } else {
-            redirectAttributes.addFlashAttribute("errorPago", "Transacción rechazada por el banco emisor. Por favor verifica los datos o usa otra tarjeta de prueba.");
-            return "redirect:/pagos/webpay/" + reservaId + (grupo != null ? "?grupo=" + grupo : "");
+
+            WebpayPlusTransactionCreateResponse response = webpayService.iniciarPago(buyOrder, sessionId, totalPagar);
+
+            model.addAttribute("url", response.getUrl());
+            model.addAttribute("tokenWs", response.getToken());
+            return "reservas/redireccion_webpay";
+        } catch (Exception e) {
+            model.addAttribute("mensaje", "Error al conectar con Webpay: " + e.getMessage());
+            return "reservas/pago_fallido";
         }
-    }
-
-    @PostMapping("/transferencia/procesar")
-    public String procesarTransferencia(@RequestParam("reservaId") Long reservaId,
-                                        @RequestParam(value = "grupo", required = false) String grupo,
-                                        @RequestParam("bancoOrigen") String bancoOrigen,
-                                        @RequestParam("comprobanteNumero") String comprobanteNumero,
-                                        RedirectAttributes redirectAttributes) {
-
-        Pago pago = webpaySandboxService.simularTransferencia(reservaId, bancoOrigen, comprobanteNumero);
-        if (pago == null) {
-            redirectAttributes.addFlashAttribute("error", "Error al procesar la transferencia.");
-            return "redirect:/reservas/mis-reservas";
-        }
-
-        if (grupo != null && !grupo.isEmpty()) {
-            List<Reserva> grupoReservas = reservaRepository.findByGrupoRecurrente(grupo);
-            for (Reserva r : grupoReservas) {
-                r.setEstado("CONFIRMADA");
-                reservaRepository.save(r);
-            }
-        }
-
-        return "redirect:/pagos/comprobante/" + pago.getId();
     }
 
     @GetMapping("/comprobante/{pagoId}")
@@ -128,7 +82,7 @@ public class PagoController {
         }
 
         model.addAttribute("pago", pago);
-        model.addAttribute("codigoComercio", WebpaySandboxService.CODIGO_COMERCIO);
+        model.addAttribute("codigoComercio", codigoComercio);
         model.addAttribute("usuarioLogueado", usuario);
 
         return "pagos/comprobante";

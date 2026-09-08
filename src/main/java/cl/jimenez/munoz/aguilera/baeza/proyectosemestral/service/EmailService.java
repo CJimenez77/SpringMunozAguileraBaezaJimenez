@@ -19,6 +19,9 @@ public class EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
+    @org.springframework.beans.factory.annotation.Value("${spring.mail.username:notificaciones@canchasya.cl}")
+    private String remitente;
+
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -127,7 +130,11 @@ public class EmailService {
                 helper.setTo(destinatario);
                 helper.setSubject(asunto);
                 helper.setText(html, true);
-                helper.setFrom("notificaciones@canchasya.cl");
+                if (remitente != null && !remitente.isEmpty()) {
+                    helper.setFrom(remitente, "CanchasYa");
+                } else {
+                    helper.setFrom("notificaciones@canchasya.cl", "CanchasYa");
+                }
                 mailSender.send(mensaje);
                 log.info("Correo enviado exitosamente a {}", destinatario);
             } else {
