@@ -283,6 +283,7 @@ public class CanchaController {
             return "redirect:/canchas";
         }
 
+        nuevaTarifa.setId(null);
         nuevaTarifa.setCancha(cancha);
         nuevaTarifa.setActivo(true);
         tarifaFranjaRepository.save(nuevaTarifa);
