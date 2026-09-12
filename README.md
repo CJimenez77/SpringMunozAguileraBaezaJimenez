@@ -55,3 +55,17 @@ Configuradas en `src/main/resources/application.properties`:
 ### Autenticacion Bancaria
 - RUT: 11.111.111-1
 - Clave: 123
+
+## 6. Usuarios de Prueba
+
+Se crean automáticamente al iniciar la aplicación por primera vez (ver `DataSeeder`):
+
+Administrador General: 
+- admin@canchasya.cl - admin123
+
+Administrador de complejo
+- complejo@canchasya.cl - complejo123
+
+Cliente
+- cliente@canchasya.cl - cliente123
+

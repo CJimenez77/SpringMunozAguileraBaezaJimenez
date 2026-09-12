@@ -179,6 +179,8 @@ public class ComplejoController {
 
         nuevoServicio.setComplejo(complejo);
         nuevoServicio.setActivo(true);
+        nuevoServicio.setId(null); // Obliga a Spring Boot a crear un nuevo registro
+
         servicioAdicionalRepository.save(nuevoServicio);
         return "redirect:/complejos/" + id + "/servicios";
     }
