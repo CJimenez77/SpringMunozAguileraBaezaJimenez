@@ -29,6 +29,14 @@
             color: #ffc107;
             font-size: 0.95rem;
         }
+
+        .fav-btn {
+            min-width: 34px;
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
     <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
     <script th:src="@{/js/dark-mode.js}"></script>
@@ -36,46 +44,7 @@
 
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
-                <i class="bi bi-trophy-fill text-warning"></i>
-                <span>CanchasYa</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar
-                            Canchas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/reservas/mis-reservas}"><i
-                                class="bi bi-calendar-check me-1"></i>Mis Reservas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center gap-2" th:if="${usuarioLogueado != null}">
-                    <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </a>
-                </div>
-                <div th:if="${usuarioLogueado == null}">
-                    <a th:href="@{/login}" class="btn btn-primary btn-sm">Iniciar Sesión</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <nav th:replace="~{fragments/navbar :: navbar('explorar')}"></nav>
 
     <div class="container py-4 py-md-5">
         <div class="mb-4">
@@ -147,19 +116,57 @@
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"
                                 th:text="${c.tipo_cancha}"></span>
-                            <div class="rating-stars d-flex align-items-center gap-1">
-                                <i class="bi bi-star-fill"></i>
-                                <span class="text-dark fw-bold small"
-                                    th:text="${promedios.get(c.id_cancha) > 0 ? promedios.get(c.id_cancha) : 'Nuevo'}"></span>
-                                <span class="text-muted small" th:if="${conteos.get(c.id_cancha) > 0}"
-                                    th:text="'(' + ${conteos.get(c.id_cancha)} + ')'"></span>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rating-stars d-flex align-items-center gap-1">
+                                    <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                    <span class="text-dark fw-bold small"
+                                        th:text="${promedios.get(c.id_cancha) > 0 ? promedios.get(c.id_cancha) : 'Nuevo'}"></span>
+                                    <span class="text-muted small" th:if="${conteos.get(c.id_cancha) > 0}"
+                                        th:text="'(' + ${conteos.get(c.id_cancha)} + ')'"></span>
+                                </div>
+                                <form th:if="${usuarioLogueado != null}"
+                                    th:action="@{/favoritos/cancha/{id}(id=${c.id_cancha})}"
+                                    method="post"
+                                    class="d-inline fav-toggle-form"
+                                    th:data-api-url="@{/favoritos/api/cancha/{id}(id=${c.id_cancha})}"
+                                    th:data-nombre="${c.nombre_cancha}"
+                                    data-tipo="cancha">
+                                    <input type="hidden" name="redirect" value="/explorar">
+                                    <button type="submit"
+                                        class="btn btn-sm fav-btn"
+                                        th:classappend="${canchasFavoritasIds.contains(c.id_cancha) ? 'btn-danger' : 'btn-outline-danger'}"
+                                        th:aria-pressed="${canchasFavoritasIds.contains(c.id_cancha)}"
+                                        th:aria-label="${(canchasFavoritasIds.contains(c.id_cancha) ? 'Quitar cancha ' : 'Agregar cancha ') + c.nombre_cancha + ' de favoritos'}"
+                                        title="Favorito de cancha">
+                                        <i class="bi" th:classappend="${canchasFavoritasIds.contains(c.id_cancha) ? 'bi-heart-fill' : 'bi-heart'}" aria-hidden="true"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
                         <h5 class="fw-bold text-dark mb-1" th:text="${c.nombre_cancha}"></h5>
-                        <div class="text-muted small mb-2">
-                            <i class="bi bi-building me-1 text-secondary"></i>
-                            <span class="fw-semibold" th:text="${c.complejo.nombre_complejo}"></span>
+                        <div class="text-muted small mb-2 d-flex align-items-center justify-content-between gap-2">
+                            <div>
+                                <i class="bi bi-building me-1 text-secondary" aria-hidden="true"></i>
+                                <span class="fw-semibold" th:text="${c.complejo.nombre_complejo}"></span>
+                            </div>
+                            <form th:if="${usuarioLogueado != null}"
+                                th:action="@{/favoritos/complejo/{id}(id=${c.complejo.id_complejo})}"
+                                method="post"
+                                class="d-inline fav-toggle-form"
+                                th:data-api-url="@{/favoritos/api/complejo/{id}(id=${c.complejo.id_complejo})}"
+                                th:data-nombre="${c.complejo.nombre_complejo}"
+                                data-tipo="complejo">
+                                <input type="hidden" name="redirect" value="/explorar">
+                                <button type="submit"
+                                    class="btn btn-sm py-0 px-2 border-0"
+                                    th:classappend="${complejosFavoritosIds.contains(c.complejo.id_complejo) ? 'text-danger' : 'text-secondary'}"
+                                    th:aria-pressed="${complejosFavoritosIds.contains(c.complejo.id_complejo)}"
+                                    th:aria-label="${(complejosFavoritosIds.contains(c.complejo.id_complejo) ? 'Quitar complejo ' : 'Agregar complejo ') + c.complejo.nombre_complejo + ' de favoritos'}"
+                                    title="Guardar complejo como favorito">
+                                    <i class="bi" th:classappend="${complejosFavoritosIds.contains(c.complejo.id_complejo) ? 'bi-bookmark-heart-fill' : 'bi-bookmark-heart'}" aria-hidden="true"></i>
+                                </button>
+                            </form>
                         </div>
                         <div class="text-muted small mb-3">
                             <i class="bi bi-geo-alt me-1 text-secondary"></i>
@@ -191,7 +198,67 @@
         </div>
     </div>
 
+    <div id="fav-status-announcer" class="visually-hidden" aria-live="polite"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            const announcer = document.getElementById('fav-status-announcer');
+            document.querySelectorAll('.fav-toggle-form').forEach(function (form) {
+                form.addEventListener('submit', async function (event) {
+                    const apiUrl = form.dataset.apiUrl;
+                    if (!apiUrl || !window.fetch) return;
+                    event.preventDefault();
+
+                    const btn = form.querySelector('button[type="submit"]');
+                    const icon = btn.querySelector('i');
+                    const tipo = form.dataset.tipo;
+                    const nombre = form.dataset.nombre || '';
+
+                    btn.disabled = true;
+                    try {
+                        const res = await fetch(apiUrl, { method: 'POST', headers: { 'Accept': 'application/json' } });
+                        if (res.status === 401) {
+                            window.location.href = '/login';
+                            return;
+                        }
+                        if (!res.ok) {
+                            form.submit();
+                            return;
+                        }
+                        const data = await res.json();
+                        const fav = Boolean(data.favorito);
+                        btn.setAttribute('aria-pressed', fav ? 'true' : 'false');
+                        btn.setAttribute('aria-label', (fav ? 'Quitar ' : 'Agregar ') + tipo + ' ' + nombre + (fav ? ' de favoritos' : ' a favoritos'));
+
+                        if (tipo === 'cancha') {
+                            btn.classList.toggle('btn-danger', fav);
+                            btn.classList.toggle('btn-outline-danger', !fav);
+                            if (icon) {
+                                icon.classList.toggle('bi-heart-fill', fav);
+                                icon.classList.toggle('bi-heart', !fav);
+                            }
+                        } else {
+                            btn.classList.toggle('text-danger', fav);
+                            btn.classList.toggle('text-secondary', !fav);
+                            if (icon) {
+                                icon.classList.toggle('bi-bookmark-heart-fill', fav);
+                                icon.classList.toggle('bi-bookmark-heart', !fav);
+                            }
+                        }
+
+                        if (announcer && data.mensaje) {
+                            announcer.textContent = data.mensaje;
+                        }
+                    } catch (e) {
+                        form.submit();
+                    } finally {
+                        btn.disabled = false;
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>

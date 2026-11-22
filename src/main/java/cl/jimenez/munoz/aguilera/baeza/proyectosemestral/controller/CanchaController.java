@@ -6,6 +6,7 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ComplejoRepo
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.HorarioCanchaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.TarifaFranjaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.DisponibilidadService;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.FavoritoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,17 +27,20 @@ public class CanchaController {
     private final HorarioCanchaRepository horarioCanchaRepository;
     private final TarifaFranjaRepository tarifaFranjaRepository;
     private final DisponibilidadService disponibilidadService;
+    private final FavoritoService favoritoService;
 
     public CanchaController(CanchaRepository canchaRepository,
                             ComplejoRepositorio complejoRepositorio,
                             HorarioCanchaRepository horarioCanchaRepository,
                             TarifaFranjaRepository tarifaFranjaRepository,
-                            DisponibilidadService disponibilidadService) {
+                            DisponibilidadService disponibilidadService,
+                            FavoritoService favoritoService) {
         this.canchaRepository = canchaRepository;
         this.complejoRepositorio = complejoRepositorio;
         this.horarioCanchaRepository = horarioCanchaRepository;
         this.tarifaFranjaRepository = tarifaFranjaRepository;
         this.disponibilidadService = disponibilidadService;
+        this.favoritoService = favoritoService;
     }
 
     @GetMapping
@@ -52,6 +56,7 @@ public class CanchaController {
         }
 
         model.addAttribute("canchas", canchas);
+        model.addAttribute("canchasFavoritasIds", favoritoService.obtenerIdsCanchasFavoritas(usuario));
         model.addAttribute("usuarioLogueado", usuario);
         return "canchas/lista";
     }
@@ -73,6 +78,7 @@ public class CanchaController {
 
         model.addAttribute("canchas", canchaRepository.findByComplejoIdAndActivoTrue(idComplejo));
         model.addAttribute("complejoFiltro", complejo);
+        model.addAttribute("canchasFavoritasIds", favoritoService.obtenerIdsCanchasFavoritas(usuario));
         model.addAttribute("usuarioLogueado", usuario);
         return "canchas/lista";
     }

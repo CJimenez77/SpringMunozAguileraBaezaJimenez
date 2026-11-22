@@ -33,4 +33,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             + "ORDER BY r.fecha, r.horaInicio, r.id")
     List<Reserva> findParaReportes(@Param("usuario") Usuario usuario, @Param("todos") boolean todos,
                                  @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query("SELECT r FROM Reserva r JOIN FETCH r.usuario JOIN FETCH r.cancha c JOIN FETCH c.complejo " +
+            "WHERE r.estado = 'CONFIRMADA' AND r.fecha BETWEEN :desde AND :hasta")
+    List<Reserva> findConfirmadasParaRecordatorio(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
 }

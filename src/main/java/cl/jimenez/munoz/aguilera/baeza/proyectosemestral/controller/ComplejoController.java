@@ -5,6 +5,7 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.ServicioAdicional
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ComplejoRepositorio;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ServicioAdicionalRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.FavoritoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,11 +22,14 @@ public class ComplejoController {
 
     private final ComplejoRepositorio complejoRepositorio;
     private final ServicioAdicionalRepository servicioAdicionalRepository;
+    private final FavoritoService favoritoService;
 
     public ComplejoController(ComplejoRepositorio complejoRepositorio,
-                              ServicioAdicionalRepository servicioAdicionalRepository) {
+                              ServicioAdicionalRepository servicioAdicionalRepository,
+                              FavoritoService favoritoService) {
         this.complejoRepositorio = complejoRepositorio;
         this.servicioAdicionalRepository = servicioAdicionalRepository;
+        this.favoritoService = favoritoService;
     }
 
     @GetMapping
@@ -41,6 +45,7 @@ public class ComplejoController {
             lista = complejoRepositorio.findByActivoTrue();
         }
         model.addAttribute("complejos", lista);
+        model.addAttribute("complejosFavoritosIds", favoritoService.obtenerIdsComplejosFavoritos(logueado));
         model.addAttribute("usuarioLogueado", logueado);
         return "complejos/lista";
     }

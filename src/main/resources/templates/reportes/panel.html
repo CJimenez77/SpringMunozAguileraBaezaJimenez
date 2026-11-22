@@ -11,27 +11,7 @@
     <script th:src="@{/js/dark-mode.js}"></script>
 </head>
 <body class="bg-light reports-page">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
-            <i class="bi bi-trophy-fill text-warning" aria-hidden="true"></i><span>CanchasYa</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Abrir menú">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Inicio</a></li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" th:href="@{/reportes}"><i class="bi bi-graph-up-arrow me-1" aria-hidden="true"></i>Reportes</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1" aria-hidden="true"></i>Complejos</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1" aria-hidden="true"></i>Canchas</a></li>
-            </ul>
-            <div class="d-flex align-items-center gap-2">
-                <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
-            </div>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{fragments/navbar :: navbar('reportes')}"></nav>
 
 <main class="container reports-shell">
     <header class="report-header">

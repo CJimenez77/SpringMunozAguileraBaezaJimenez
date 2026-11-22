@@ -4,6 +4,7 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Cancha;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.CanchaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ResenaRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.FavoritoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +18,14 @@ public class ExploradorController {
 
     private final CanchaRepository canchaRepository;
     private final ResenaRepository resenaRepository;
+    private final FavoritoService favoritoService;
 
-    public ExploradorController(CanchaRepository canchaRepository, ResenaRepository resenaRepository) {
+    public ExploradorController(CanchaRepository canchaRepository,
+                                ResenaRepository resenaRepository,
+                                FavoritoService favoritoService) {
         this.canchaRepository = canchaRepository;
         this.resenaRepository = resenaRepository;
+        this.favoritoService = favoritoService;
     }
 
     @GetMapping("/explorar")
@@ -71,6 +76,8 @@ public class ExploradorController {
         model.addAttribute("canchas", filtradas);
         model.addAttribute("promedios", promedios);
         model.addAttribute("conteos", conteos);
+        model.addAttribute("canchasFavoritasIds", favoritoService.obtenerIdsCanchasFavoritas(usuario));
+        model.addAttribute("complejosFavoritosIds", favoritoService.obtenerIdsComplejosFavoritos(usuario));
         model.addAttribute("deporteFiltro", deporte);
         model.addAttribute("busquedaFiltro", busqueda);
         model.addAttribute("precioMaxFiltro", precioMax);

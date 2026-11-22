@@ -30,49 +30,7 @@
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
-            <i class="bi bi-trophy-fill text-warning"></i>
-            <span>CanchasYa</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
-                </li>
-                <li class="nav-item" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
-                    <a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people-fill me-1"></i>Usuarios</a>
-                </li>
-                <li class="nav-item" th:if="${usuario.rol == 'ADMIN_SISTEMA' or usuario.rol == 'ADMIN_COMPLEJO'}">
-                    <a class="nav-link" th:href="@{/reportes}"><i class="bi bi-graph-up-arrow me-1"></i>Reportes</a>
-                </li>
-            </ul>
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2 text-white">
-                    <img th:src="${usuario.foto != null && !usuario.foto.isEmpty() ? usuario.foto : 'https://placehold.co/40x40?text=U'}"
-                         class="rounded-circle border border-secondary" width="36" height="36" style="object-fit: cover;">
-                    <div class="d-none d-sm-block text-end lh-sm">
-                        <span class="fw-semibold d-block small" th:text="${usuario.nombre}">Usuario</span>
-                        <span class="text-white-50 small" style="font-size: 0.75rem;" th:text="${usuario.rol}">ROL</span>
-                    </div>
-                </div>
-                <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
-                    <i class="bi bi-box-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{fragments/navbar :: navbar('inicio')}"></nav>
 
 <div class="container py-4 py-md-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4 pb-2 border-bottom">
@@ -161,6 +119,52 @@
                     <div class="d-flex gap-2 mt-3 pt-3 border-top">
                         <a th:href="@{/canchas}" class="btn btn-outline-info btn-sm flex-fill">Ver canchas</a>
                         <a th:if="${usuario.rol != 'CLIENTE'}" th:href="@{/canchas/nuevo}" class="btn btn-info text-white btn-sm" title="Nueva Cancha"><i class="bi bi-plus-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-warning text-dark mb-3">
+                        <i class="bi bi-compass fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Explorar y Reservar</h5>
+                    <p class="text-muted small flex-grow-1">Busca canchas disponibles por deporte, precio o calificación y agenda tu partido.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/explorar}" class="btn btn-outline-warning text-dark btn-sm flex-fill">Explorar canchas</a>
+                        <a th:href="@{/reservas/crear}" class="btn btn-warning text-dark btn-sm" title="Nueva Reserva"><i class="bi bi-plus-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-secondary text-white mb-3">
+                        <i class="bi bi-calendar-check fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Mis Reservas</h5>
+                    <p class="text-muted small flex-grow-1">Revisa tus partidos agendados, organiza equipos, cancela o transfiere una reserva.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/reservas/mis-reservas}" class="btn btn-outline-secondary btn-sm flex-fill">Ver mis reservas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-danger text-white mb-3">
+                        <i class="bi bi-heart-fill fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Mis Favoritos</h5>
+                    <p class="text-muted small flex-grow-1">Accede directamente a tus canchas y complejos deportivos preferidos.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/favoritos}" class="btn btn-outline-danger btn-sm flex-fill">Ver favoritos</a>
                     </div>
                 </div>
             </div>
