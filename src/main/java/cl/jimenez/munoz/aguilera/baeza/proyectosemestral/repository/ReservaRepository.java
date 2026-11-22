@@ -3,6 +3,7 @@ package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Cancha;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Reserva;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.projection.EstadisticasProyecciones;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,4 +38,28 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Query("SELECT r FROM Reserva r JOIN FETCH r.usuario JOIN FETCH r.cancha c JOIN FETCH c.complejo " +
             "WHERE r.estado = 'CONFIRMADA' AND r.fecha BETWEEN :desde AND :hasta")
     List<Reserva> findConfirmadasParaRecordatorio(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query("SELECT c.id_cancha AS canchaId, c.nombre_cancha AS nombre, c.complejo.nombre_complejo AS complejo, "
+            + "COUNT(r) AS reservas FROM Reserva r JOIN r.cancha c "
+            + "WHERE c IN :canchas AND r.fecha BETWEEN :desde AND :hasta "
+            + "AND r.estado IN ('CONFIRMADA', 'COMPLETADA') "
+            + "GROUP BY c.id_cancha, c.nombre_cancha, c.complejo.nombre_complejo "
+            + "ORDER BY COUNT(r) DESC, c.nombre_cancha, c.id_cancha")
+    List<EstadisticasProyecciones.CanchaReservada> findRankingCanchas(
+            @Param("canchas") List<Cancha> canchas, @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query("SELECT HOUR(r.horaInicio) AS hora, COUNT(r) AS reservas FROM Reserva r "
+            + "WHERE r.cancha IN :canchas AND r.fecha BETWEEN :desde AND :hasta "
+            + "AND r.estado IN ('CONFIRMADA', 'COMPLETADA') "
+            + "GROUP BY HOUR(r.horaInicio) ORDER BY COUNT(r) DESC, HOUR(r.horaInicio)")
+    List<EstadisticasProyecciones.HoraDemandada> findRankingHoras(
+            @Param("canchas") List<Cancha> canchas, @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query("SELECT u.id AS clienteId, u.nombre AS nombre, u.email AS email, COUNT(r) AS reservas "
+            + "FROM Reserva r JOIN r.usuario u "
+            + "WHERE r.cancha IN :canchas AND r.fecha BETWEEN :desde AND :hasta "
+            + "AND r.estado IN ('CONFIRMADA', 'COMPLETADA') "
+            + "GROUP BY u.id, u.nombre, u.email ORDER BY COUNT(r) DESC, u.nombre, u.id")
+    List<EstadisticasProyecciones.ClienteFrecuente> findRankingClientes(
+            @Param("canchas") List<Cancha> canchas, @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
 }

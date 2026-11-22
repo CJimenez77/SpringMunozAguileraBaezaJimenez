@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas y Rankings - CanchasYa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+    <script th:src="@{/js/dark-mode.js}"></script>
+    <style>
+        .ranking-table > :not(caption) > * > * { padding: 0.85rem 1rem; }
+        .ranking-position { width: 50px; color: var(--bs-secondary-color); font-variant-numeric: tabular-nums; }
+        .ranking-name { overflow-wrap: anywhere; }
+        .ranking-scroll { max-height: 390px; overflow: auto; }
+        .ranking-number { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .ranking-chart { position: relative; height: 320px; }
+        .ranking-tabs { flex-wrap: nowrap; overflow-x: auto; }
+        .ranking-tabs .nav-item { flex: 1 0 auto; }
+        .ranking-tabs .nav-link { width: 100%; padding: 0.85rem 1rem; white-space: nowrap; }
+        .ranking-client-email { display: block; font-size: 0.75rem; overflow-wrap: anywhere; }
+    </style>
+</head>
+<body class="bg-light">
+<nav th:replace="~{fragments/navbar :: navbar('estadisticas')}"></nav>
+
+<main class="container py-4 py-md-5" th:with="seccion=${param.seccion != null and (param.seccion[0] == 'horarios' or param.seccion[0] == 'clientes') ? param.seccion[0] : 'canchas'}">
+    <div class="mb-4 pb-2 border-bottom">
+        <h2 class="fw-bold mb-1 text-dark">Estadísticas y Rankings</h2>
+        <p class="text-muted small mb-0">Canchas más reservadas, horarios, calificaciones y clientes frecuentes.</p>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <section class="card shadow-sm border-0 mb-3" aria-label="Filtro de fechas">
+        <div class="card-body">
+            <form th:action="@{/estadisticas}" method="get" class="row g-3 align-items-end">
+                <input type="hidden" name="seccion" id="seccionEstadisticas" th:value="${seccion}">
+                <div class="col-12 col-sm-4">
+                    <label for="desde" class="form-label small fw-semibold">Desde</label>
+                    <input type="date" class="form-control" id="desde" name="desde" th:value="${desde}" required>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <label for="hasta" class="form-label small fw-semibold">Hasta (inclusive)</label>
+                    <input type="date" class="form-control" id="hasta" name="hasta" th:value="${hasta}" required>
+                </div>
+                <div class="col-12 col-sm-4 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">Aplicar filtro</button>
+                    <a th:href="@{/estadisticas(seccion=${seccion})}" class="btn btn-outline-secondary">Este mes</a>
+                </div>
+            </form>
+            <p class="text-muted small mt-3 mb-0">Selecciona un período de hasta 366 días.</p>
+        </div>
+    </section>
+    <p class="text-muted small mb-4" th:text="'Período: ' + ${#temporals.format(desde, 'dd/MM/yyyy')} + ' al ' + ${#temporals.format(hasta, 'dd/MM/yyyy')}"></p>
+
+    <h3 class="h6 fw-semibold text-dark mb-3">Resumen del período</h3>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <span class="text-muted small">Reservas analizadas</span>
+                <h3 class="fw-bold text-dark mt-2 mb-1 ranking-number" th:text="${estadisticas.reservasAnalizadas}"></h3>
+                <small class="text-muted">Confirmadas o completadas</small>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <span class="text-muted small">Canchas reservadas</span>
+                <h3 class="fw-bold text-dark mt-2 mb-1 ranking-number" th:text="${estadisticas.canchasReservadas}"></h3>
+                <small class="text-muted">Con reservas en el período</small>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <span class="text-muted small">Clientes distintos</span>
+                <h3 class="fw-bold text-dark mt-2 mb-1 ranking-number" th:text="${estadisticas.clientesDistintos}"></h3>
+                <small class="text-muted">Titulares de las reservas</small>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <span class="text-muted small">Calificación media</span>
+                <h3 class="fw-bold text-dark mt-2 mb-1 ranking-number" th:text="${estadisticas.calificacionPromedio != null ? #numbers.formatDecimal(estadisticas.calificacionPromedio, 1, 1, 'COMMA') + ' / 5' : '—'}"></h3>
+                <small class="text-muted" th:text="${estadisticas.totalOpiniones} + ' reseñas recibidas'"></small>
+            </div></div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs ranking-tabs mb-4" role="tablist" aria-label="Secciones de estadísticas">
+        <li class="nav-item" role="presentation"><button class="nav-link" th:classappend="${seccion == 'canchas'} ? 'active' : ''" id="tab-canchas" data-bs-toggle="tab" data-bs-target="#panel-canchas" data-stats-section="canchas" type="button" role="tab" aria-controls="panel-canchas" th:attr="aria-selected=${seccion == 'canchas'}"><i class="bi bi-grid me-2" aria-hidden="true"></i>Canchas</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" th:classappend="${seccion == 'horarios'} ? 'active' : ''" id="tab-horarios" data-bs-toggle="tab" data-bs-target="#panel-horarios" data-stats-section="horarios" type="button" role="tab" aria-controls="panel-horarios" th:attr="aria-selected=${seccion == 'horarios'}"><i class="bi bi-clock me-2" aria-hidden="true"></i>Horarios</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" th:classappend="${seccion == 'clientes'} ? 'active' : ''" id="tab-clientes" data-bs-toggle="tab" data-bs-target="#panel-clientes" data-stats-section="clientes" type="button" role="tab" aria-controls="panel-clientes" th:attr="aria-selected=${seccion == 'clientes'}"><i class="bi bi-people me-2" aria-hidden="true"></i>Clientes</button></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade" th:classappend="${seccion == 'canchas'} ? 'show active' : ''" id="panel-canchas" role="tabpanel" aria-labelledby="tab-canchas" tabindex="0">
+            <div class="row g-4">
+                <div class="col-12 col-lg-6">
+            <section class="card shadow-sm border-0 h-100" aria-labelledby="tituloCanchas">
+                <div class="card-header bg-white py-3 px-4">
+                    <h5 id="tituloCanchas" class="fw-bold text-dark mb-1">Canchas más reservadas</h5>
+                    <p class="text-muted small mb-0">Top 10 · Reservas confirmadas o completadas</p>
+                </div>
+                <p th:if="${#lists.isEmpty(estadisticas.canchas)}" class="text-muted small p-4 mb-0">No hay reservas para ordenar en este período.</p>
+                <div th:unless="${#lists.isEmpty(estadisticas.canchas)}" class="table-responsive ranking-scroll">
+                    <table class="table table-hover align-middle ranking-table mb-0">
+                        <thead class="table-light"><tr><th scope="col">Pos.</th><th scope="col">Cancha</th><th scope="col" class="text-end">Reservas</th></tr></thead>
+                        <tbody>
+                        <tr th:each="cancha, posicion : ${estadisticas.canchas}">
+                            <td class="ranking-position" th:text="${posicion.count}"></td>
+                            <td class="ranking-name"><span class="fw-semibold text-dark" th:text="${cancha.nombre}"></span><small class="d-block text-muted" th:text="${cancha.complejo}"></small></td>
+                            <td class="text-end fw-semibold ranking-number" th:text="${cancha.reservas}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+                </div>
+                <div class="col-12 col-lg-6">
+            <section class="card shadow-sm border-0 h-100" aria-labelledby="tituloCalificaciones">
+                <div class="card-header bg-white py-3 px-4"><h5 id="tituloCalificaciones" class="fw-bold text-dark mb-1">Calificación por cancha</h5><p class="text-muted small mb-0">Reseñas recibidas en el período · Escala de 1 a 5</p></div>
+                <p th:if="${#lists.isEmpty(estadisticas.calificaciones)}" class="text-muted small p-4 mb-0">No hay canchas asociadas a tu cuenta.</p>
+                <div th:unless="${#lists.isEmpty(estadisticas.calificaciones)}" class="table-responsive ranking-scroll">
+                    <table class="table table-hover align-middle ranking-table mb-0">
+                        <thead class="table-light"><tr><th scope="col">Cancha</th><th scope="col" class="text-end">Promedio</th><th scope="col" class="text-end">Reseñas</th></tr></thead>
+                        <tbody>
+                        <tr th:each="cancha : ${estadisticas.calificaciones}">
+                            <td class="ranking-name"><span class="fw-semibold text-dark" th:text="${cancha.nombre}"></span><small class="d-block text-muted" th:text="${cancha.complejo}"></small></td>
+                            <td class="text-end ranking-number">
+                                <span th:if="${cancha.promedio != null}"><i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i><span th:text="${#numbers.formatDecimal(cancha.promedio, 1, 1, 'COMMA')} + ' / 5'"></span></span>
+                                <span th:unless="${cancha.promedio != null}" class="text-muted small">Sin calificaciones</span>
+                            </td>
+                            <td class="text-end ranking-number" th:text="${cancha.opiniones}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" th:classappend="${seccion == 'horarios'} ? 'show active' : ''" id="panel-horarios" role="tabpanel" aria-labelledby="tab-horarios" tabindex="0">
+            <div class="row g-4">
+                <div class="col-12 col-lg-8">
+                    <section class="card shadow-sm border-0 h-100" aria-labelledby="tituloHoras">
+                        <div class="card-header bg-white py-3 px-4"><h5 id="tituloHoras" class="fw-bold text-dark mb-1">Horas más demandadas</h5><p class="text-muted small mb-0">Reservas confirmadas o completadas por hora de inicio</p></div>
+                        <div class="card-body p-4">
+                            <p th:if="${#lists.isEmpty(estadisticas.horas)}" class="text-muted small mb-0">No hay reservas confirmadas para mostrar.</p>
+                            <div th:unless="${#lists.isEmpty(estadisticas.horas)}" class="ranking-chart"><canvas id="chartDemanda" role="img" aria-label="Reservas confirmadas o completadas por hora de inicio"></canvas></div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <section class="card shadow-sm border-0 h-100" aria-labelledby="tituloRankingHoras">
+                        <div class="card-header bg-white py-3 px-4"><h5 id="tituloRankingHoras" class="fw-bold text-dark mb-1">Ranking de horarios</h5><p class="text-muted small mb-0">De mayor a menor demanda</p></div>
+                        <p th:if="${#lists.isEmpty(estadisticas.horas)}" class="text-muted small p-4 mb-0">No hay horarios para ordenar en este período.</p>
+                        <div th:unless="${#lists.isEmpty(estadisticas.horas)}" class="table-responsive ranking-scroll">
+                            <table class="table table-hover align-middle ranking-table mb-0">
+                                <thead class="table-light"><tr><th scope="col">Pos.</th><th scope="col">Hora</th><th scope="col" class="text-end">Reservas</th></tr></thead>
+                                <tbody><tr th:each="hora, posicion : ${estadisticas.horas}"><td class="ranking-position" th:text="${posicion.count}"></td><td class="ranking-number" th:text="${hora.hora}"></td><td class="text-end fw-semibold ranking-number" th:text="${hora.reservas}"></td></tr></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" th:classappend="${seccion == 'clientes'} ? 'show active' : ''" id="panel-clientes" role="tabpanel" aria-labelledby="tab-clientes" tabindex="0">
+            <section class="card shadow-sm border-0 h-100" aria-labelledby="tituloClientes">
+                <div class="card-header bg-white py-3 px-4"><h5 id="tituloClientes" class="fw-bold text-dark mb-1">Clientes más frecuentes</h5><p class="text-muted small mb-0">Top 10 · Reservas confirmadas o completadas</p></div>
+                <p th:if="${#lists.isEmpty(estadisticas.clientes)}" class="text-muted small p-4 mb-0">No hay clientes con reservas en este período.</p>
+                <div th:unless="${#lists.isEmpty(estadisticas.clientes)}" class="table-responsive ranking-scroll">
+                    <table class="table table-hover align-middle ranking-table mb-0">
+                        <thead class="table-light"><tr><th scope="col">Pos.</th><th scope="col">Cliente</th><th scope="col" class="text-end">Reservas</th></tr></thead>
+                        <tbody>
+                        <tr th:each="cliente, posicion : ${estadisticas.clientes}">
+                            <td class="ranking-position" th:text="${posicion.count}"></td>
+                            <td class="ranking-name"><span class="fw-semibold text-dark" th:text="${cliente.nombre}"></span><small class="text-muted ranking-client-email" th:text="${cliente.email}"></small></td>
+                            <td class="text-end fw-semibold ranking-number" th:text="${cliente.reservas}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    const demanda = /*[[${demandaPorHora}]]*/ {};
+    const canvas = document.getElementById('chartDemanda');
+    const seccionActual = document.getElementById('seccionEstadisticas');
+    let grafico = null;
+    const colores = () => document.documentElement.getAttribute('data-bs-theme') === 'dark'
+        ? { texto: '#9aa0a6', lineas: '#2c3238' } : { texto: '#6c757d', lineas: '#e9ecef' };
+
+    function prepararGrafico() {
+        if (!canvas || typeof Chart === 'undefined') return;
+        if (grafico) { grafico.resize(); return; }
+        const tema = colores();
+        grafico = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: Object.keys(demanda),
+                datasets: [{ label: 'Reservas', data: Object.values(demanda), borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13,110,253,0.10)', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, tension: 0.3, fill: true }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(window.devicePixelRatio || 1, 2),
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: context => context.parsed.y + ' reservas' } } },
+                scales: {
+                    x: { ticks: { color: tema.texto }, grid: { display: false }, title: { display: true, text: 'Hora de inicio', color: tema.texto } },
+                    y: { beginAtZero: true, ticks: { precision: 0, maxTicksLimit: 6, color: tema.texto }, grid: { color: tema.lineas }, title: { display: true, text: 'Reservas', color: tema.texto } }
+                }
+            }
+        });
+    }
+
+    document.querySelectorAll('[data-stats-section]').forEach(boton => {
+        boton.addEventListener('shown.bs.tab', () => {
+            seccionActual.value = boton.dataset.statsSection;
+            if (boton.dataset.statsSection === 'horarios') prepararGrafico();
+        });
+    });
+    if (document.getElementById('panel-horarios').classList.contains('active')) prepararGrafico();
+    new MutationObserver(() => {
+        if (!grafico) return;
+        const nuevo = colores();
+        for (const eje of Object.values(grafico.options.scales)) { eje.ticks.color = nuevo.texto; eje.title.color = nuevo.texto; }
+        grafico.options.scales.y.grid.color = nuevo.lineas;
+        grafico.update('none');
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+</script>
+</body>
+</html>

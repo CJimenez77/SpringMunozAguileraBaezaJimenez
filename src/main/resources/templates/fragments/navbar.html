@@ -77,6 +77,14 @@
                         <i class="bi bi-graph-up-arrow me-1" aria-hidden="true"></i>Reportes
                     </a>
                 </li>
+                <li class="nav-item" th:if="${usuarioActual != null && (usuarioActual.rol == 'ADMIN_SISTEMA' || usuarioActual.rol == 'ADMIN_COMPLEJO')}">
+                    <a class="nav-link"
+                       th:classappend="${activeTab == 'estadisticas' ? 'active' : ''}"
+                       th:attr="aria-current=${activeTab == 'estadisticas' ? 'page' : null}"
+                       th:href="@{/estadisticas}">
+                        <i class="bi bi-bar-chart-line me-1" aria-hidden="true"></i>Estadísticas
+                    </a>
+                </li>
                 <li class="nav-item" th:if="${usuarioActual != null && usuarioActual.rol == 'ADMIN_SISTEMA'}">
                     <a class="nav-link"
                        th:classappend="${activeTab == 'usuarios' ? 'active' : ''}"
