@@ -27,6 +27,7 @@ public class ReservaController {
     private final CanchaRepository canchaRepository;
     private final ServicioAdicionalRepository servicioAdicionalRepository;
     private final ResenaRepository resenaRepository;
+    private final TransferenciaReservaRepository transferenciaReservaRepository;
     private final DisponibilidadService disponibilidadService;
     private final ReservaService reservaService;
     private final WebpayService webpayService;
@@ -35,6 +36,7 @@ public class ReservaController {
                              CanchaRepository canchaRepository,
                              ServicioAdicionalRepository servicioAdicionalRepository,
                              ResenaRepository resenaRepository,
+                             TransferenciaReservaRepository transferenciaReservaRepository,
                              DisponibilidadService disponibilidadService,
                              ReservaService reservaService,
                              WebpayService webpayService) {
@@ -42,6 +44,7 @@ public class ReservaController {
         this.canchaRepository = canchaRepository;
         this.servicioAdicionalRepository = servicioAdicionalRepository;
         this.resenaRepository = resenaRepository;
+        this.transferenciaReservaRepository = transferenciaReservaRepository;
         this.disponibilidadService = disponibilidadService;
         this.reservaService = reservaService;
         this.webpayService = webpayService;
@@ -175,6 +178,7 @@ public class ReservaController {
         }
 
         model.addAttribute("reservas", reservas);
+        model.addAttribute("transferenciasUsuario", transferenciaReservaRepository.findHistorialPorUsuario(usuario));
         model.addAttribute("usuarioLogueado", usuario);
         return "reservas/mis-reservas";
     }
@@ -191,7 +195,8 @@ public class ReservaController {
             return "redirect:/reservas/mis-reservas";
         }
 
-        boolean puedeVer = reserva.getUsuario().getId().equals(usuario.getId()) ||
+        boolean esTitular = reserva.getUsuario().getId().equals(usuario.getId());
+        boolean puedeVer = esTitular ||
                 "ADMIN_SISTEMA".equals(usuario.getRol()) ||
                 ("ADMIN_COMPLEJO".equals(usuario.getRol()) &&
                         reserva.getCancha().getComplejo().getDueno() != null &&
@@ -202,8 +207,34 @@ public class ReservaController {
         }
 
         model.addAttribute("reserva", reserva);
+        model.addAttribute("esTitular", esTitular);
+        model.addAttribute("transferencias", transferenciaReservaRepository.findHistorialPorReserva(reserva));
         model.addAttribute("usuarioLogueado", usuario);
         return "reservas/detalle";
+    }
+
+    @PostMapping("/transferir/{id}")
+    public String transferirReserva(@PathVariable("id") Long id,
+                                    @RequestParam("emailDestino") String emailDestino,
+                                    @RequestParam(value = "motivo", required = false) String motivo,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            TransferenciaReserva transferencia = reservaService.transferirReserva(id, usuario, emailDestino, motivo);
+            redirectAttributes.addFlashAttribute("exito",
+                    "Reserva #" + transferencia.getReserva().getCodigoReserva() +
+                            " transferida exitosamente a " + transferencia.getUsuarioDestino().getNombre() +
+                            " (" + transferencia.getUsuarioDestino().getEmail() + ").");
+            return "redirect:/reservas/mis-reservas";
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/reservas/detalle/" + id + "#transferir";
+        }
     }
 
     @PostMapping("/cancelar/{id}")

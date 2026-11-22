@@ -35,6 +35,12 @@
                     <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/favoritos}"><i class="bi bi-heart-fill me-1 text-danger" aria-hidden="true"></i>Mis Favoritos</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
                 </li>
                 <li class="nav-item">
@@ -72,6 +78,13 @@
         </div>
     </div>
 
+    <div th:if="${exito}" class="alert alert-success py-2 small text-center" role="alert">
+        <span th:text="${exito}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger py-2 small text-center" role="alert">
+        <span th:text="${error}"></span>
+    </div>
+
     <div th:if="${#lists.isEmpty(canchas)}" class="card shadow-sm border-0 text-center py-5">
         <div class="card-body">
             <i class="bi bi-grid-3x3-gap text-muted" style="font-size: 3rem;"></i>
@@ -96,9 +109,22 @@
                     <p class="fw-bold text-success mb-3" th:text="'$' + ${#numbers.formatInteger(c.precio_hora, 3, 'POINT')} + ' / hr'"></p>
 
                     <div class="mt-auto">
-                        <a th:href="@{/reservas/crear(canchaId=${c.id_cancha})}" class="btn btn-sm btn-success btn-action w-100 mb-2">
-                            <i class="bi bi-calendar-plus"></i> Reservar
-                        </a>
+                        <div class="d-flex gap-2 mb-2">
+                            <a th:href="@{/reservas/crear(canchaId=${c.id_cancha})}" class="btn btn-sm btn-success btn-action flex-fill">
+                                <i class="bi bi-calendar-plus" aria-hidden="true"></i> Reservar
+                            </a>
+                            <form th:action="@{/favoritos/cancha/{id}(id=${c.id_cancha})}" method="post" class="d-inline">
+                                <input type="hidden" name="redirect" value="/canchas">
+                                <button type="submit"
+                                    class="btn btn-sm btn-action"
+                                    th:classappend="${canchasFavoritasIds.contains(c.id_cancha) ? 'btn-danger' : 'btn-outline-danger'}"
+                                    th:aria-pressed="${canchasFavoritasIds.contains(c.id_cancha)}"
+                                    th:aria-label="${(canchasFavoritasIds.contains(c.id_cancha) ? 'Quitar cancha ' : 'Agregar cancha ') + c.nombre_cancha + ' de favoritos'}"
+                                    title="Favorito">
+                                    <i class="bi" th:classappend="${canchasFavoritasIds.contains(c.id_cancha) ? 'bi-heart-fill' : 'bi-heart'}" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </div>
                         <div class="d-flex gap-2" th:if="${usuarioLogueado.rol != 'CLIENTE'}">
                             <a th:href="@{/canchas/{id}/horarios(id=${c.id_cancha})}" class="btn btn-sm btn-outline-secondary btn-action flex-fill" title="Horarios de Apertura">
                                 <i class="bi bi-clock"></i>

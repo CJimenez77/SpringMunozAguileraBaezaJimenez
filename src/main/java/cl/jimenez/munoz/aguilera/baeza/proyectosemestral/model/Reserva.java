@@ -57,6 +57,12 @@ public class Reserva {
     @Column(length = 60)
     private String grupoRecurrente;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean recordatorio24hEnviado = false;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean recordatorio2hEnviado = false;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "reserva_servicios",
@@ -112,12 +118,26 @@ public class Reserva {
     public List<ServicioAdicional> getServicios() { return servicios; }
     public void setServicios(List<ServicioAdicional> servicios) { this.servicios = servicios; }
 
+    public boolean isRecordatorio24hEnviado() { return recordatorio24hEnviado; }
+    public void setRecordatorio24hEnviado(boolean recordatorio24hEnviado) { this.recordatorio24hEnviado = recordatorio24hEnviado; }
+
+    public boolean isRecordatorio2hEnviado() { return recordatorio2hEnviado; }
+    public void setRecordatorio2hEnviado(boolean recordatorio2hEnviado) { this.recordatorio2hEnviado = recordatorio2hEnviado; }
+
     public boolean esCancelable() {
         if (!"CONFIRMADA".equals(estado) && !"PENDIENTE".equals(estado)) {
             return false;
         }
         LocalDateTime fechaHoraInicio = LocalDateTime.of(fecha, horaInicio);
         return Duration.between(LocalDateTime.now(), fechaHoraInicio).toHours() >= 24;
+    }
+
+    public boolean esTransferible() {
+        if (!"CONFIRMADA".equals(estado)) {
+            return false;
+        }
+        LocalDateTime fechaHoraInicio = LocalDateTime.of(fecha, horaInicio);
+        return fechaHoraInicio.isAfter(LocalDateTime.now());
     }
 }
 

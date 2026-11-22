@@ -38,6 +38,12 @@
                     <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/favoritos}"><i class="bi bi-heart-fill me-1 text-danger" aria-hidden="true"></i>Mis Favoritos</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link active" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
                 </li>
                 <li class="nav-item">
@@ -70,6 +76,13 @@
         </div>
     </div>
 
+    <div th:if="${exito}" class="alert alert-success py-2 small text-center" role="alert">
+        <span th:text="${exito}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger py-2 small text-center" role="alert">
+        <span th:text="${error}"></span>
+    </div>
+
     <div th:if="${#lists.isEmpty(complejos)}" class="card shadow-sm border-0 text-center py-5">
         <div class="card-body">
             <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
@@ -98,6 +111,16 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2">
+                        <form th:action="@{/favoritos/complejo/{id}(id=${c.id_complejo})}" method="post" class="d-inline">
+                            <input type="hidden" name="redirect" value="/complejos">
+                            <button type="submit"
+                                class="btn btn-sm btn-action"
+                                th:classappend="${complejosFavoritosIds.contains(c.id_complejo) ? 'btn-danger' : 'btn-outline-danger'}"
+                                th:aria-pressed="${complejosFavoritosIds.contains(c.id_complejo)}"
+                                th:aria-label="${(complejosFavoritosIds.contains(c.id_complejo) ? 'Quitar complejo ' : 'Agregar complejo ') + c.nombre_complejo + ' de favoritos'}">
+                                <i class="bi" th:classappend="${complejosFavoritosIds.contains(c.id_complejo) ? 'bi-heart-fill' : 'bi-heart'}" aria-hidden="true"></i>
+                            </button>
+                        </form>
                         <a th:href="@{/canchas/complejo/{id}(id=${c.id_complejo})}" class="btn btn-outline-info btn-sm flex-fill btn-action">
                             <i class="bi bi-grid"></i> Canchas
                         </a>
@@ -140,6 +163,17 @@
                         </td>
                         <td class="text-end pe-4">
                             <div class="d-inline-flex gap-2">
+                                <form th:action="@{/favoritos/complejo/{id}(id=${c.id_complejo})}" method="post" class="d-inline">
+                                    <input type="hidden" name="redirect" value="/complejos">
+                                    <button type="submit"
+                                        class="btn btn-sm btn-action px-2 py-1"
+                                        th:classappend="${complejosFavoritosIds.contains(c.id_complejo) ? 'btn-danger' : 'btn-outline-danger'}"
+                                        th:aria-pressed="${complejosFavoritosIds.contains(c.id_complejo)}"
+                                        th:aria-label="${(complejosFavoritosIds.contains(c.id_complejo) ? 'Quitar complejo ' : 'Agregar complejo ') + c.nombre_complejo + ' de favoritos'}"
+                                        title="Favorito">
+                                        <i class="bi" th:classappend="${complejosFavoritosIds.contains(c.id_complejo) ? 'bi-heart-fill' : 'bi-heart'}" aria-hidden="true"></i>
+                                    </button>
+                                </form>
                                 <a th:href="@{/canchas/complejo/{id}(id=${c.id_complejo})}" class="btn btn-sm btn-outline-info btn-action px-2 py-1" title="Ver Canchas">
                                     <i class="bi bi-grid"></i> Canchas
                                 </a>

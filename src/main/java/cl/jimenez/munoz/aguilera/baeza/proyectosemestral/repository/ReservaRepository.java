@@ -22,4 +22,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     @Query("SELECT r FROM Reserva r WHERE r.cancha = :cancha AND r.fecha = :fecha AND r.estado != 'CANCELADA'")
     List<Reserva> findReservasActivasPorCanchaYFecha(@Param("cancha") Cancha cancha, @Param("fecha") LocalDate fecha);
+
+    @Query("SELECT r FROM Reserva r JOIN FETCH r.usuario JOIN FETCH r.cancha c JOIN FETCH c.complejo " +
+            "WHERE r.estado = 'CONFIRMADA' AND r.fecha BETWEEN :desde AND :hasta")
+    List<Reserva> findConfirmadasParaRecordatorio(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
 }

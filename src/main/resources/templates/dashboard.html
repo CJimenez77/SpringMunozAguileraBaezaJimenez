@@ -45,6 +45,15 @@
                     <a class="nav-link active" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/favoritos}"><i class="bi bi-heart-fill me-1 text-danger" aria-hidden="true"></i>Mis Favoritos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/reservas/mis-reservas}"><i class="bi bi-calendar-check me-1"></i>Mis Reservas</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
                 </li>
                 <li class="nav-item">
@@ -158,6 +167,52 @@
                     <div class="d-flex gap-2 mt-3 pt-3 border-top">
                         <a th:href="@{/canchas}" class="btn btn-outline-info btn-sm flex-fill">Ver canchas</a>
                         <a th:if="${usuario.rol != 'CLIENTE'}" th:href="@{/canchas/nuevo}" class="btn btn-info text-white btn-sm" title="Nueva Cancha"><i class="bi bi-plus-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-warning text-dark mb-3">
+                        <i class="bi bi-compass fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Explorar y Reservar</h5>
+                    <p class="text-muted small flex-grow-1">Busca canchas disponibles por deporte, precio o calificación y agenda tu partido.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/explorar}" class="btn btn-outline-warning text-dark btn-sm flex-fill">Explorar canchas</a>
+                        <a th:href="@{/reservas/crear}" class="btn btn-warning text-dark btn-sm" title="Nueva Reserva"><i class="bi bi-plus-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-secondary text-white mb-3">
+                        <i class="bi bi-calendar-check fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Mis Reservas</h5>
+                    <p class="text-muted small flex-grow-1">Revisa tus partidos agendados, organiza equipos, cancela o transfiere una reserva.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/reservas/mis-reservas}" class="btn btn-outline-secondary btn-sm flex-fill">Ver mis reservas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-danger text-white mb-3">
+                        <i class="bi bi-heart-fill fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Mis Favoritos</h5>
+                    <p class="text-muted small flex-grow-1">Accede directamente a tus canchas y complejos deportivos preferidos.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/favoritos}" class="btn btn-outline-danger btn-sm flex-fill">Ver favoritos</a>
                     </div>
                 </div>
             </div>
