@@ -185,6 +185,21 @@
             </div>
         </div>
 
+        <div class="col-12 col-md-4" th:if="${usuario.rol == 'ADMIN_SISTEMA' or usuario.rol == 'ADMIN_COMPLEJO'}">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-secondary text-white mb-3">
+                        <i class="bi bi-bar-chart-line fs-4" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Estadísticas y Rankings</h5>
+                    <p class="text-muted small flex-grow-1">Consulta las canchas más reservadas, las horas más demandadas, las calificaciones y los clientes frecuentes.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/estadisticas}" class="btn btn-outline-primary btn-sm flex-fill">Ver estadísticas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-12 col-md-4" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
             <div class="card shadow-sm border-0 h-100 module-card">
                 <div class="card-body p-4 d-flex flex-column">
