@@ -4,14 +4,21 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Cancha;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Complejo;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CanchaRepository extends JpaRepository<Cancha, Long> {
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM Cancha c WHERE c.id_cancha = :id")
+    Optional<Cancha> findByIdParaActualizar(@Param("id") Long id);
+
     List<Cancha> findByActivoTrue();
 
     @Query("SELECT c FROM Cancha c WHERE c.complejo.id_complejo = :idComplejo AND c.activo = true")

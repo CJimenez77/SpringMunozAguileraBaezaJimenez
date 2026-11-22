@@ -2,6 +2,7 @@ package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service;
 
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.*;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.PagoRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.CanchaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,23 +21,28 @@ public class ReservaService {
     private final TarifaService tarifaService;
     private final PagoRepository pagoRepository;
     private final EmailService emailService;
+    private final CanchaRepository canchaRepository;
 
     public ReservaService(ReservaRepository reservaRepository,
                           DisponibilidadService disponibilidadService,
                           TarifaService tarifaService,
                           PagoRepository pagoRepository,
-                          EmailService emailService) {
+                          EmailService emailService, CanchaRepository canchaRepository) {
         this.reservaRepository = reservaRepository;
         this.disponibilidadService = disponibilidadService;
         this.tarifaService = tarifaService;
         this.pagoRepository = pagoRepository;
         this.emailService = emailService;
+        this.canchaRepository = canchaRepository;
     }
 
     @Transactional
     public Reserva crearReserva(Usuario usuario, Cancha cancha, LocalDate fecha, LocalTime horaInicio,
                                 int duracionMinutos, List<ServicioAdicional> servicios, String grupoRecurrente) {
 
+        // Comparte el bloqueo de fila con los cierres administrativos para evitar cruces concurrentes.
+        cancha = canchaRepository.findByIdParaActualizar(cancha.getId_cancha())
+                .orElseThrow(() -> new IllegalArgumentException("La cancha no existe."));
         if (!disponibilidadService.validarDisponibilidad(cancha, fecha, horaInicio, duracionMinutos)) {
             throw new IllegalArgumentException("El horario seleccionado no se encuentra disponible.");
         }

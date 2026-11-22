@@ -1,10 +1,12 @@
 package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service;
 
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.BloqueHorario;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.BloqueoHorario;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Cancha;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.HorarioCancha;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Reserva;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.HorarioCanchaRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.BloqueoHorarioRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +22,15 @@ public class DisponibilidadService {
     private final HorarioCanchaRepository horarioCanchaRepository;
     private final ReservaRepository reservaRepository;
     private final TarifaService tarifaService;
+    private final BloqueoHorarioRepository bloqueoRepository;
 
     public DisponibilidadService(HorarioCanchaRepository horarioCanchaRepository,
             ReservaRepository reservaRepository,
-            TarifaService tarifaService) {
+            TarifaService tarifaService, BloqueoHorarioRepository bloqueoRepository) {
         this.horarioCanchaRepository = horarioCanchaRepository;
         this.reservaRepository = reservaRepository;
         this.tarifaService = tarifaService;
+        this.bloqueoRepository = bloqueoRepository;
     }
 
     public HorarioCancha obtenerOCrearHorario(Cancha cancha, int diaSemana) {
@@ -59,6 +63,7 @@ public class DisponibilidadService {
         }
 
         List<Reserva> reservasDelDia = reservaRepository.findReservasActivasPorCanchaYFecha(cancha, fecha);
+        List<BloqueoHorario> bloqueosDelDia = bloqueoRepository.findPorRango(cancha, fecha, fecha);
 
         LocalTime cursor = horario.getHoraApertura();
         LocalTime fin = horario.getHoraCierre();
@@ -80,12 +85,21 @@ public class DisponibilidadService {
 
             int precio = tarifaService.calcularPrecioHora(cancha, fecha, cursor);
             boolean peak = tarifaService.esHoraPeak(cancha, fecha, cursor);
+            String motivo = ocupada ? "Reservada" : "Disponible";
+            boolean bloqueada = false;
+            for (BloqueoHorario bloqueo : bloqueosDelDia) {
+                if (bloqueo.seSuperpone(fecha, cursor, siguiente)) {
+                    bloqueada = true;
+                    motivo = "Bloqueada: " + bloqueo.getMotivo();
+                    break;
+                }
+            }
 
             BloqueHorario bloque = new BloqueHorario(
                     cursor,
                     siguiente,
-                    !ocupada,
-                    ocupada ? "Reservada" : "Disponible",
+                    !ocupada && !bloqueada,
+                    motivo,
                     precio,
                     peak);
             bloques.add(bloque);
@@ -107,6 +121,12 @@ public class DisponibilidadService {
         LocalTime horaFin = horaInicio.plusMinutes(duracionMinutos);
         if (horaInicio.isBefore(horario.getHoraApertura()) || horaFin.isAfter(horario.getHoraCierre())) {
             return false;
+        }
+
+        for (BloqueoHorario bloqueo : bloqueoRepository.findPorRango(cancha, fecha, fecha)) {
+            if (bloqueo.seSuperpone(fecha, horaInicio, horaFin)) {
+                return false;
+            }
         }
 
         List<Reserva> reservasDelDia = reservaRepository.findReservasActivasPorCanchaYFecha(cancha, fecha);
