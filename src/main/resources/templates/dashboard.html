@@ -30,55 +30,7 @@
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
-            <i class="bi bi-trophy-fill text-warning"></i>
-            <span>CanchasYa</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/favoritos}"><i class="bi bi-heart-fill me-1 text-danger" aria-hidden="true"></i>Mis Favoritos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/reservas/mis-reservas}"><i class="bi bi-calendar-check me-1"></i>Mis Reservas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
-                </li>
-                <li class="nav-item" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
-                    <a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people-fill me-1"></i>Usuarios</a>
-                </li>
-            </ul>
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2 text-white">
-                    <img th:src="${usuario.foto != null && !usuario.foto.isEmpty() ? usuario.foto : 'https://placehold.co/40x40?text=U'}"
-                         class="rounded-circle border border-secondary" width="36" height="36" style="object-fit: cover;">
-                    <div class="d-none d-sm-block text-end lh-sm">
-                        <span class="fw-semibold d-block small" th:text="${usuario.nombre}">Usuario</span>
-                        <span class="text-white-50 small" style="font-size: 0.75rem;" th:text="${usuario.rol}">ROL</span>
-                    </div>
-                </div>
-                <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
-                    <i class="bi bi-box-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{fragments/navbar :: navbar('inicio')}"></nav>
 
 <div class="container py-4 py-md-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4 pb-2 border-bottom">

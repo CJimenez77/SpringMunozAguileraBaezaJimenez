@@ -15,7 +15,9 @@
         btn.setAttribute('title', 'Modo oscuro');
         btn.innerHTML = '<i class="' + (currentTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill') + '"></i>';
 
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             var curr = document.documentElement.getAttribute('data-bs-theme') || 'light';
             var next = curr === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-bs-theme', next);
@@ -26,8 +28,9 @@
             }
         });
 
-        var navUserArea = document.querySelector('.navbar .d-flex.align-items-center');
-        if (navUserArea) {
+        var navUserArea = document.getElementById('navbarUserArea') ||
+                document.querySelector('.navbar div.d-flex.align-items-center');
+        if (navUserArea && !navUserArea.closest('a')) {
             navUserArea.appendChild(btn);
         } else {
             var navContainer = document.querySelector('.navbar .container, .navbar .container-fluid');

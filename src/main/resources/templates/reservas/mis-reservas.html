@@ -26,46 +26,7 @@
 
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
-                <i class="bi bi-trophy-fill text-warning"></i>
-                <span>CanchasYa</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/explorar}"><i class="bi bi-compass me-1"></i>Explorar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/favoritos}"><i class="bi bi-heart-fill me-1 text-danger" aria-hidden="true"></i>Mis Favoritos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/reservas/mis-reservas}"><i
-                                class="bi bi-calendar-check me-1"></i>Mis Reservas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/pagos/historial}"><i
-                                class="bi bi-credit-card me-1"></i>Historial Pagos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center gap-2">
-                    <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <nav th:replace="~{fragments/navbar :: navbar('reservas')}"></nav>
 
     <div class="container py-4 py-md-5">
         <div class="row align-items-center mb-4 g-3">
@@ -182,7 +143,7 @@
                                         th:text="${r.estado}"></span>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <div class="d-inline-flex gap-2">
+                                    <div class="d-inline-flex flex-wrap justify-content-end gap-1">
                                         <a th:href="@{/reservas/detalle/{id}(id=${r.id})}"
                                             class="btn btn-sm btn-outline-info btn-action px-2 py-1"
                                             title="Ver Detalle">
