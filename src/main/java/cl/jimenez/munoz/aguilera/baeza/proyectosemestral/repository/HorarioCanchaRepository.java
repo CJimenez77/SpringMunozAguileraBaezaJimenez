@@ -14,4 +14,6 @@ public interface HorarioCanchaRepository extends JpaRepository<HorarioCancha, Lo
     Optional<HorarioCancha> findByCanchaAndDiaSemana(Cancha cancha, Integer diaSemana);
 
     List<HorarioCancha> findByCanchaOrderByDiaSemanaAsc(Cancha cancha);
+
+    List<HorarioCancha> findByCanchaIn(List<Cancha> canchas);
 }

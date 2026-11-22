@@ -3,210 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Reportes y Ocupación - CanchasYa</title>
+    <title>Reportes - CanchasYa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .stat-card {
-            border-radius: 12px;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-    </style>
     <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+    <link rel="stylesheet" th:href="@{/css/reportes.css}">
     <script th:src="@{/js/dark-mode.js}"></script>
 </head>
-<body class="bg-light">
-
+<body class="bg-light reports-page">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2" th:href="@{/dashboard}">
-            <i class="bi bi-trophy-fill text-warning"></i>
-            <span>CanchasYa</span>
+            <i class="bi bi-trophy-fill text-warning" aria-hidden="true"></i><span>CanchasYa</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Abrir menú">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarMain">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1"></i>Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/reportes}"><i class="bi bi-graph-up-arrow me-1"></i>Reportes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1"></i>Complejos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1"></i>Canchas</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Inicio</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" th:href="@{/reportes}"><i class="bi bi-graph-up-arrow me-1" aria-hidden="true"></i>Reportes</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/complejos}"><i class="bi bi-geo-alt-fill me-1" aria-hidden="true"></i>Complejos</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/canchas}"><i class="bi bi-grid-fill me-1" aria-hidden="true"></i>Canchas</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2">
-                <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
-                    <i class="bi bi-box-arrow-right"></i>
-                </a>
+                <a th:href="@{/logout}" class="btn btn-outline-light btn-sm" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
             </div>
         </div>
     </div>
 </nav>
 
-<div class="container py-4 py-md-5">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4 pb-2 border-bottom">
+<main class="container reports-shell">
+    <header class="report-header">
         <div>
-            <h2 class="fw-bold mb-1 text-dark">Panel de Reportes y Analítica</h2>
-            <p class="text-muted small mb-0">Rendimiento financiero, tasa de ocupación y horarios con mayor demanda</p>
+            <h2>Reportes</h2>
+            <p class="report-subtitle">Ingresos, reservas y uso de tus canchas.</p>
         </div>
-        <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-printer me-1"></i>Exportar Reporte
-        </button>
+        <div class="report-exports" aria-label="Exportar el período aplicado">
+            <span class="report-exports-label">Exportar</span>
+            <a th:href="@{/reportes/exportar/pdf(desde=${desde},hasta=${hasta})}" class="report-button"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>PDF</a>
+            <a th:href="@{/reportes/exportar/excel(desde=${desde},hasta=${hasta})}" class="report-button"><i class="bi bi-file-earmark-excel" aria-hidden="true"></i>Excel</a>
+        </div>
+    </header>
+
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <section class="report-filter" aria-label="Filtro de fechas">
+        <form th:action="@{/reportes}" method="get" class="report-filter-form">
+            <div class="report-filter-label"><strong>Período del reporte</strong><span>Fecha del partido · Hasta 366 días</span></div>
+            <div class="report-date-field">
+                <label for="desde">Desde</label>
+                <input type="date" class="form-control" name="desde" id="desde" th:value="${desde}" required>
+            </div>
+            <div class="report-date-field">
+                <label for="hasta">Hasta, inclusive</label>
+                <input type="date" class="form-control" name="hasta" id="hasta" th:value="${hasta}" required>
+            </div>
+            <button type="submit" class="report-button report-button-primary">Aplicar filtro</button>
+            <a th:href="@{/reportes}" class="report-button report-button-quiet">Este mes</a>
+        </form>
+    </section>
+
+    <p class="report-period"><i class="bi bi-calendar3" aria-hidden="true"></i><span th:text="${#temporals.format(desde, 'dd/MM/yyyy')} + ' — ' + ${#temporals.format(hasta, 'dd/MM/yyyy')}"></span><span>· Período aplicado</span></p>
+    <div th:if="${sinReservas}" class="report-notice" role="status">No hay reservas en este período. Los archivos se pueden descargar igualmente con los totales en cero.</div>
+
+    <dl class="report-metrics">
+        <div class="report-metric"><dt>Ingresos del período</dt><dd th:text="'$' + ${#numbers.formatInteger(totalIngresos, 1, 'POINT')}"></dd><p class="report-metric-note">Pesos chilenos · CLP</p></div>
+        <div class="report-metric"><dt>Reservas</dt><dd th:text="${totalReservas}"></dd><p class="report-metric-note" th:text="${confirmadas} + ' confirmadas o completadas'"></p></div>
+        <div class="report-metric"><dt>Ocupación</dt><dd th:text="${#numbers.formatDecimal(tasaOcupacion, 1, 1, 'COMMA')} + '%'"></dd><p class="report-metric-note">Del horario habilitado</p></div>
+        <div class="report-metric"><dt>Cancelaciones</dt><dd th:text="${canceladas}"></dd><p class="report-metric-note">Reservas canceladas</p></div>
+    </dl>
+
+    <div class="report-analysis">
+        <section class="report-panel" aria-labelledby="tituloIngresos">
+            <div class="report-section-heading"><h2 id="tituloIngresos">Ingresos por cancha</h2><p>Comparación del período en CLP</p></div>
+            <div th:if="${maximoIngresos > 0}" class="income-list" role="group" aria-label="Ingresos por cancha">
+                <details class="income-item" th:each="cancha : ${ingresosGrafico}">
+                    <summary class="income-summary" th:title="${cancha.cancha} + ' · ' + ${cancha.complejo}">
+                        <span class="income-label">
+                            <span class="income-name" th:text="${#strings.abbreviate(cancha.cancha.replaceFirst('(?i)^cancha ', ''), 26)}"></span>
+                            <span class="income-amount" th:text="'$' + ${#numbers.formatInteger(cancha.ingresos, 1, 'POINT')}"></span>
+                            <i class="bi bi-chevron-down income-info" aria-hidden="true"></i>
+                        </span>
+                        <span class="income-track" aria-hidden="true"><span class="income-fill" th:style="|width: ${cancha.ingresos * 100.0 / maximoIngresos}%;|"></span></span>
+                    </summary>
+                    <div class="income-detail"><p class="mb-1"><strong>Cancha:</strong> <span th:text="${cancha.cancha}"></span></p><p class="mb-0"><strong>Complejo:</strong> <span th:text="${cancha.complejo}"></span></p></div>
+                </details>
+            </div>
+            <p th:if="${maximoIngresos > 0}" class="report-hint">Selecciona una cancha para ver el detalle.</p>
+            <p th:unless="${maximoIngresos > 0}" class="report-empty">No hay ingresos confirmados en este período.</p>
+        </section>
+
+        <section class="report-panel" aria-labelledby="tituloHorarios">
+            <div class="report-section-heading"><h2 id="tituloHorarios">Reservas por hora</h2><p>Confirmadas y completadas, según su hora de inicio</p></div>
+            <div th:if="${maximoDemanda > 0}" class="report-line-chart">
+                <canvas id="chartHorarios" role="img" aria-label="Gráfico de línea: cantidad de reservas según la hora de inicio"></canvas>
+            </div>
+            <p th:unless="${maximoDemanda > 0}" class="report-empty">No hay reservas confirmadas para mostrar.</p>
+        </section>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 stat-card p-3 bg-white">
-                <span class="text-muted small fw-semibold">Ingresos Totales</span>
-                <h3 class="fw-bold text-success mb-0 mt-2" th:text="'$' + ${#numbers.formatInteger(totalIngresos, 3, 'POINT')}"></h3>
-                <small class="text-muted" style="font-size: 0.75rem;">Recaudación confirmada</small>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 stat-card p-3 bg-white">
-                <span class="text-muted small fw-semibold">Tasa de Ocupación</span>
-                <h3 class="fw-bold text-primary mb-0 mt-2" th:text="${tasaOcupacion} + '%'"></h3>
-                <small class="text-muted" style="font-size: 0.75rem;">Efectividad de reservas</small>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 stat-card p-3 bg-white">
-                <span class="text-muted small fw-semibold">Reservas Confirmadas</span>
-                <h3 class="fw-bold text-dark mb-0 mt-2" th:text="${confirmadas}"></h3>
-                <small class="text-muted" style="font-size: 0.75rem;">Partidos concretados</small>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 stat-card p-3 bg-white">
-                <span class="text-muted small fw-semibold">Cancelaciones</span>
-                <h3 class="fw-bold text-danger mb-0 mt-2" th:text="${canceladas}"></h3>
-                <small class="text-muted" style="font-size: 0.75rem;">Reembolsos procesados</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-lg-7">
-            <div class="card shadow-sm border-0 p-4 bg-white h-100">
-                <h5 class="fw-bold text-dark mb-3">Ingresos Generados por Cancha (CLP)</h5>
-                <canvas id="chartIngresos" height="220"></canvas>
-            </div>
-        </div>
-
-        <div class="col-12 col-lg-5">
-            <div class="card shadow-sm border-0 p-4 bg-white h-100">
-                <h5 class="fw-bold text-dark mb-3">Horarios Más Solicitados</h5>
-                <canvas id="chartHorarios" height="220"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0 overflow-hidden bg-white">
-        <div class="card-header bg-white py-3 px-4">
-            <h5 class="fw-bold mb-0 text-dark">Desglose Detallado por Recinto</h5>
-        </div>
+    <section class="report-breakdown" aria-labelledby="tituloDesglose">
+        <div class="report-section-heading"><h2 id="tituloDesglose">Detalle por cancha</h2><p>Las cifras completas del período seleccionado</p></div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                <tr>
-                    <th class="ps-4">Cancha</th>
-                    <th>Reservas Totales</th>
-                    <th class="text-end pe-4">Ingresos Recaudados</th>
-                </tr>
-                </thead>
+            <table class="report-table">
+                <thead><tr><th scope="col">Cancha</th><th scope="col">Complejo</th><th scope="col" class="numeric">Reservas</th><th scope="col" class="numeric">Ocupación</th><th scope="col" class="numeric">Ingresos · CLP</th></tr></thead>
                 <tbody>
-                <tr th:each="entry : ${ingresosPorCancha}">
-                    <td class="ps-4 fw-semibold text-dark" th:text="${entry.key}"></td>
-                    <td>
-                        <span class="badge bg-primary-subtle text-primary border" th:text="${reservasPorCancha.get(entry.key)} + ' partidos'"></span>
-                    </td>
-                    <td class="text-end pe-4 text-success fw-bold" th:text="'$' + ${#numbers.formatInteger(entry.value, 3, 'POINT')} + ' CLP'"></td>
-                </tr>
+                    <tr th:each="cancha : ${detalleCanchas}">
+                        <td class="court-name" th:text="${cancha.cancha}"></td>
+                        <td class="complex-name" th:text="${cancha.complejo}"></td>
+                        <td class="numeric" th:text="${cancha.reservas}"></td>
+                        <td class="numeric" th:text="${#numbers.formatDecimal(cancha.tasaOcupacion(), 1, 1, 'COMMA')} + '%'"></td>
+                        <td class="numeric" th:text="'$' + ${#numbers.formatInteger(cancha.ingresos, 1, 'POINT')}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(detalleCanchas)}"><td colspan="5">No hay canchas asociadas a tu cuenta.</td></tr>
                 </tbody>
+                <tfoot th:unless="${#lists.isEmpty(detalleCanchas)}"><tr><td colspan="2">Total del período</td><td class="numeric" th:text="${totalReservas}"></td><td class="numeric" th:text="${#numbers.formatDecimal(tasaOcupacion, 1, 1, 'COMMA')} + '%'"></td><td class="numeric" th:text="'$' + ${#numbers.formatInteger(totalIngresos, 1, 'POINT')}"></td></tr></tfoot>
             </table>
         </div>
-    </div>
-</div>
+    </section>
 
+</main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
-    /*<![CDATA[*/
-    const dataIngresosMap = /*[[${ingresosPorCancha}]]*/ {};
-    const dataHorariosMap = /*[[${horariosDemandados}]]*/ {};
-
-    const canchasLabels = Object.keys(dataIngresosMap);
-    const canchasValores = Object.values(dataIngresosMap);
-
-    const ctxIngresos = document.getElementById('chartIngresos').getContext('2d');
-    new Chart(ctxIngresos, {
-        type: 'bar',
-        data: {
-            labels: canchasLabels.length > 0 ? canchasLabels : ['Sin registros'],
-            datasets: [{
-                label: 'Ingresos (CLP)',
-                data: canchasValores.length > 0 ? canchasValores : [0],
-                backgroundColor: 'rgba(25, 135, 84, 0.7)',
-                borderColor: 'rgba(25, 135, 84, 1)',
-                borderWidth: 1,
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) { return '$' + value.toLocaleString('es-CL'); }
+    const demandaPorHora = /*[[${horariosDemandados}]]*/ {};
+    const canvasHorarios = document.getElementById('chartHorarios');
+    if (canvasHorarios && typeof Chart !== 'undefined') {
+        const coloresGrafico = () => {
+            const estilos = getComputedStyle(document.body);
+            return {
+                texto: estilos.getPropertyValue('--report-muted').trim(),
+                lineas: estilos.getPropertyValue('--report-line').trim()
+            };
+        };
+        const colores = coloresGrafico();
+        const graficoHorarios = new Chart(canvasHorarios, {
+            type: 'line',
+            data: {
+                labels: Object.keys(demandaPorHora),
+                datasets: [{
+                    label: 'Reservas',
+                    data: Object.values(demandaPorHora),
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.10)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                devicePixelRatio: Math.max(window.devicePixelRatio || 1, 2),
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: context => context.parsed.y + ' reservas' } }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Hora de inicio', color: colores.texto },
+                        ticks: { color: colores.texto },
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Reservas', color: colores.texto },
+                        ticks: { precision: 0, maxTicksLimit: 6, color: colores.texto },
+                        grid: { color: colores.lineas }
                     }
                 }
             }
-        }
-    });
-
-    const horariosLabels = Object.keys(dataHorariosMap);
-    const horariosValores = Object.values(dataHorariosMap);
-
-    const ctxHorarios = document.getElementById('chartHorarios').getContext('2d');
-    new Chart(ctxHorarios, {
-        type: 'line',
-        data: {
-            labels: horariosLabels.length > 0 ? horariosLabels : ['Sin datos'],
-            datasets: [{
-                label: 'Reservas por Hora',
-                data: horariosValores.length > 0 ? horariosValores : [0],
-                backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                borderColor: 'rgba(13, 110, 253, 1)',
-                borderWidth: 2,
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
+        });
+        new MutationObserver(() => {
+            const tema = coloresGrafico();
+            for (const eje of Object.values(graficoHorarios.options.scales)) {
+                eje.ticks.color = tema.texto;
+                eje.title.color = tema.texto;
             }
-        }
-    });
-    /*]]>*/
+            graficoHorarios.options.scales.y.grid.color = tema.lineas;
+            graficoHorarios.update('none');
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+    }
 </script>
 </body>
 </html>

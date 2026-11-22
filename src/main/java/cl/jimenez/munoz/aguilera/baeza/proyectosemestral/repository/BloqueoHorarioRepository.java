@@ -16,4 +16,9 @@ public interface BloqueoHorarioRepository extends JpaRepository<BloqueoHorario, 
             + "AND b.fechaInicio <= :fin AND b.fechaFin >= :inicio ORDER BY b.fechaInicio, b.id")
     List<BloqueoHorario> findPorRango(@Param("cancha") Cancha cancha,
                                     @Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+    @Query("SELECT b FROM BloqueoHorario b WHERE b.cancha IN :canchas "
+            + "AND b.fechaInicio <= :hasta AND b.fechaFin >= :desde")
+    List<BloqueoHorario> findParaReportes(@Param("canchas") List<Cancha> canchas,
+                                        @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
 }

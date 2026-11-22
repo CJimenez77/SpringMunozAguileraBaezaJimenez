@@ -30,4 +30,8 @@ public interface CanchaRepository extends JpaRepository<Cancha, Long> {
     List<Cancha> findByComplejoInAndActivoTrue(List<Complejo> complejos);
 
     long countByActivoTrue();
+
+    @Query("SELECT c FROM Cancha c JOIN FETCH c.complejo co "
+            + "WHERE (:todos = true OR co.dueno = :usuario) ORDER BY co.nombre_complejo, c.nombre_cancha, c.id_cancha")
+    List<Cancha> findParaReportes(@Param("usuario") Usuario usuario, @Param("todos") boolean todos);
 }

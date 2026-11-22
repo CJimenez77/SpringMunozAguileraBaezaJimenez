@@ -53,6 +53,9 @@
                 <li class="nav-item" th:if="${usuario.rol == 'ADMIN_SISTEMA'}">
                     <a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people-fill me-1"></i>Usuarios</a>
                 </li>
+                <li class="nav-item" th:if="${usuario.rol == 'ADMIN_SISTEMA' or usuario.rol == 'ADMIN_COMPLEJO'}">
+                    <a class="nav-link" th:href="@{/reportes}"><i class="bi bi-graph-up-arrow me-1"></i>Reportes</a>
+                </li>
             </ul>
             <div class="d-flex align-items-center gap-3">
                 <div class="d-flex align-items-center gap-2 text-white">
@@ -158,6 +161,21 @@
                     <div class="d-flex gap-2 mt-3 pt-3 border-top">
                         <a th:href="@{/canchas}" class="btn btn-outline-info btn-sm flex-fill">Ver canchas</a>
                         <a th:if="${usuario.rol != 'CLIENTE'}" th:href="@{/canchas/nuevo}" class="btn btn-info text-white btn-sm" title="Nueva Cancha"><i class="bi bi-plus-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4" th:if="${usuario.rol == 'ADMIN_SISTEMA' or usuario.rol == 'ADMIN_COMPLEJO'}">
+            <div class="card shadow-sm border-0 h-100 module-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="stat-icon bg-warning text-dark mb-3">
+                        <i class="bi bi-file-earmark-bar-graph fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Reportes y Exportaciones</h5>
+                    <p class="text-muted small flex-grow-1">Consulta ingresos, reservas y ocupación por fechas y descarga tus reportes en PDF o Excel.</p>
+                    <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                        <a th:href="@{/reportes}" class="btn btn-outline-primary btn-sm flex-fill">Ver reportes</a>
                     </div>
                 </div>
             </div>

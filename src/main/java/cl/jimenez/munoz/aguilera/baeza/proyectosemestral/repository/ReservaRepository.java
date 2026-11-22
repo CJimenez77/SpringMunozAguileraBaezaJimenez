@@ -27,4 +27,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             + "AND r.estado != 'CANCELADA' ORDER BY r.fecha, r.horaInicio")
     List<Reserva> findReservasActivasPorCanchaYRango(@Param("cancha") Cancha cancha,
                                                   @Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+    @Query("SELECT r FROM Reserva r JOIN FETCH r.cancha c JOIN FETCH c.complejo co JOIN FETCH r.usuario "
+            + "WHERE r.fecha BETWEEN :desde AND :hasta AND (:todos = true OR co.dueno = :usuario) "
+            + "ORDER BY r.fecha, r.horaInicio, r.id")
+    List<Reserva> findParaReportes(@Param("usuario") Usuario usuario, @Param("todos") boolean todos,
+                                 @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
 }
