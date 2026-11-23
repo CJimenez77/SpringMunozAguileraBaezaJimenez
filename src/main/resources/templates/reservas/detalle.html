@@ -113,6 +113,12 @@
                                             th:text="'+ $' + ${#numbers.formatInteger(s.precio, 3, 'POINT')} + ' CLP'">
                                         </td>
                                     </tr>
+                                    <tr class="text-success" th:if="${reserva.descuento != null && reserva.descuento > 0}">
+                                        <td><i class="bi bi-tag-fill me-1"></i>Descuento Fidelización (20%)</td>
+                                        <td class="text-end fw-semibold"
+                                            th:text="'- $' + ${#numbers.formatInteger(reserva.descuento, 3, 'POINT')} + ' CLP'">
+                                        </td>
+                                    </tr>
                                     <tr class="table-light">
                                         <td class="fw-bold">Total Pagado</td>
                                         <td class="text-end fw-bold text-success fs-5"

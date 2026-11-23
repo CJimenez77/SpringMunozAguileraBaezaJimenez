@@ -1,6 +1,8 @@
 package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.controller;
 
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.FidelizacionInfo;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.FidelizacionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,12 +14,30 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final FidelizacionService fidelizacionService;
+
+    public GlobalExceptionHandler(FidelizacionService fidelizacionService) {
+        this.fidelizacionService = fidelizacionService;
+    }
+
     @ModelAttribute("usuarioActual")
     public Usuario usuarioActual(HttpSession session) {
         if (session == null) {
             return null;
         }
         return (Usuario) session.getAttribute("usuarioLogueado");
+    }
+
+    @ModelAttribute("fidelizacion")
+    public FidelizacionInfo fidelizacion(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return null;
+        }
+        return fidelizacionService.obtenerInfoFidelizacion(usuario);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

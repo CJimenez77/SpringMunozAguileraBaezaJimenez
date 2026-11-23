@@ -15,6 +15,9 @@ import java.util.List;
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
+    @Query("SELECT r FROM Reserva r WHERE r.usuario = :usuario AND r.estado IN ('CONFIRMADA', 'COMPLETADA') ORDER BY r.id ASC")
+    List<Reserva> findValidasPorUsuario(@Param("usuario") Usuario usuario);
+
     List<Reserva> findByUsuarioOrderByFechaDescHoraInicioDesc(Usuario usuario);
 
     List<Reserva> findByCanchaInOrderByFechaDescHoraInicioDesc(List<Cancha> canchas);

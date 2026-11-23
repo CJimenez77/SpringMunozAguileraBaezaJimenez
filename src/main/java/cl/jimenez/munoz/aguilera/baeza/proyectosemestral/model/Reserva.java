@@ -42,6 +42,12 @@ public class Reserva {
     @Column(nullable = false)
     private Integer precioServicios = 0;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer descuento = 0;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean cuponFidelizacionAplicado = false;
+
     @Column(nullable = false)
     private Integer precioTotal;
 
@@ -99,6 +105,12 @@ public class Reserva {
 
     public Integer getPrecioServicios() { return precioServicios; }
     public void setPrecioServicios(Integer precioServicios) { this.precioServicios = precioServicios; }
+
+    public Integer getDescuento() { return descuento; }
+    public void setDescuento(Integer descuento) { this.descuento = descuento; }
+
+    public boolean isCuponFidelizacionAplicado() { return cuponFidelizacionAplicado; }
+    public void setCuponFidelizacionAplicado(boolean cuponFidelizacionAplicado) { this.cuponFidelizacionAplicado = cuponFidelizacionAplicado; }
 
     public Integer getPrecioTotal() { return precioTotal; }
     public void setPrecioTotal(Integer precioTotal) { this.precioTotal = precioTotal; }

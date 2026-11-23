@@ -100,7 +100,13 @@
                     <img th:src="${usuarioActual.foto != null && !usuarioActual.foto.isEmpty() ? usuarioActual.foto : 'https://placehold.co/40x40?text=U'}"
                          class="rounded-circle border border-secondary flex-shrink-0" width="32" height="32" style="object-fit: cover;"
                          th:alt="${usuarioActual.nombre}" th:title="${usuarioActual.nombre}">
-                    <span class="d-none d-xxl-inline small fw-semibold text-truncate" style="max-width: 140px;" th:text="${usuarioActual.nombre}">Usuario</span>
+                    <span class="small fw-semibold text-truncate" style="max-width: 140px;" th:text="${usuarioActual.nombre}">Usuario</span>
+                    <span class="badge rounded-pill bg-warning text-dark d-inline-flex align-items-center gap-1 py-1 px-2"
+                          th:if="${fidelizacion != null}"
+                          th:title="${fidelizacion.descuentoDisponible ? '¡2 de 2 reservas! Tienes 20% de descuento en tu próxima reserva' : 'Llevas ' + fidelizacion.reservasCompletadas + ' de 2 reservas. ' + (fidelizacion.faltantes == 1 ? 'Te falta 1 reserva' : 'Te faltan ' + fidelizacion.faltantes + ' reservas') + ' para el 20% de descuento.'}">
+                        <i th:class="${fidelizacion.descuentoDisponible ? 'bi bi-gift-fill text-danger' : 'bi bi-star-fill text-dark'}"></i>
+                        <span th:text="${fidelizacion.descuentoDisponible ? '2/2 (20% OFF)' : fidelizacion.reservasCompletadas + '/2 (' + (fidelizacion.faltantes == 1 ? 'Falta 1' : 'Faltan ' + fidelizacion.faltantes) + ')'}">0/2 (Faltan 2)</span>
+                    </span>
                 </div>
                 <a th:if="${usuarioActual != null}" th:href="@{/logout}" class="btn btn-outline-light btn-sm"
                    aria-label="Cerrar sesión" title="Cerrar Sesión">
