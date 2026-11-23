@@ -29,6 +29,7 @@ public class ReservaService {
     private final EmailService emailService;
     private final CanchaRepository canchaRepository;
     private final FidelizacionService fidelizacionService;
+    private final CuponService cuponService;
 
     public ReservaService(ReservaRepository reservaRepository,
                           DisponibilidadService disponibilidadService,
@@ -37,7 +38,8 @@ public class ReservaService {
                           UsuarioRepository usuarioRepository,
                           TransferenciaReservaRepository transferenciaReservaRepository,
                           EmailService emailService, CanchaRepository canchaRepository,
-                          FidelizacionService fidelizacionService) {
+                          FidelizacionService fidelizacionService,
+                          CuponService cuponService) {
         this.reservaRepository = reservaRepository;
         this.disponibilidadService = disponibilidadService;
         this.tarifaService = tarifaService;
@@ -47,19 +49,26 @@ public class ReservaService {
         this.emailService = emailService;
         this.canchaRepository = canchaRepository;
         this.fidelizacionService = fidelizacionService;
+        this.cuponService = cuponService;
     }
 
     @Transactional
     public Reserva crearReserva(Usuario usuario, Cancha cancha, LocalDate fecha, LocalTime horaInicio,
                                 int duracionMinutos, List<ServicioAdicional> servicios, String grupoRecurrente) {
+        return crearReserva(usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, grupoRecurrente, null);
+    }
+
+    @Transactional
+    public Reserva crearReserva(Usuario usuario, Cancha cancha, LocalDate fecha, LocalTime horaInicio,
+                                int duracionMinutos, List<ServicioAdicional> servicios, String grupoRecurrente, String codigoCupon) {
         boolean aplicarDescuento = fidelizacionService.tieneDescuentoDisponible(usuario);
-        return crearReservaConOpciones(usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, grupoRecurrente, aplicarDescuento);
+        return crearReservaConOpciones(usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, grupoRecurrente, aplicarDescuento, codigoCupon);
     }
 
     @Transactional
     public Reserva crearReservaConOpciones(Usuario usuario, Cancha cancha, LocalDate fecha, LocalTime horaInicio,
                                           int duracionMinutos, List<ServicioAdicional> servicios, String grupoRecurrente,
-                                          boolean aplicarDescuento) {
+                                          boolean aplicarDescuento, String codigoCupon) {
 
         cancha = canchaRepository.findByIdParaActualizar(cancha.getId_cancha())
                 .orElseThrow(() -> new IllegalArgumentException("La cancha no existe."));
@@ -73,8 +82,21 @@ public class ReservaService {
         int subtotal = precioCancha + precioServicios;
         int descuento = 0;
         if (aplicarDescuento) {
-            descuento = (int) Math.round(subtotal * 0.20);
+            descuento += (int) Math.round(subtotal * 0.20);
         }
+
+        if (codigoCupon != null && !codigoCupon.trim().isEmpty()) {
+            Optional<Cupon> cuponOpt = cuponService.validarCupon(codigoCupon);
+            if (cuponOpt.isPresent()) {
+                Cupon cupon = cuponOpt.get();
+                int porcentaje = Math.min(20, Math.max(1, cupon.getPorcentaje()));
+                int montoRestante = Math.max(0, subtotal - descuento);
+                int descuentoCupon = (int) Math.round(montoRestante * (porcentaje / 100.0));
+                descuento += descuentoCupon;
+                cuponService.registrarUso(cupon);
+            }
+        }
+
         int precioTotal = Math.max(0, subtotal - descuento);
 
         String codigo = "RES-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -105,6 +127,13 @@ public class ReservaService {
     public List<Reserva> crearReservasRecurrentes(Usuario usuario, Cancha cancha, LocalDate fechaInicio,
                                                   LocalTime horaInicio, int duracionMinutos,
                                                   List<ServicioAdicional> servicios, int semanasRecurrencia) {
+        return crearReservasRecurrentes(usuario, cancha, fechaInicio, horaInicio, duracionMinutos, servicios, semanasRecurrencia, null);
+    }
+
+    @Transactional
+    public List<Reserva> crearReservasRecurrentes(Usuario usuario, Cancha cancha, LocalDate fechaInicio,
+                                                  LocalTime horaInicio, int duracionMinutos,
+                                                  List<ServicioAdicional> servicios, int semanasRecurrencia, String codigoCupon) {
 
         for (int i = 0; i < semanasRecurrencia; i++) {
             LocalDate fechaObjetivo = fechaInicio.plusWeeks(i);
@@ -119,7 +148,8 @@ public class ReservaService {
         for (int i = 0; i < semanasRecurrencia; i++) {
             LocalDate fechaObjetivo = fechaInicio.plusWeeks(i);
             boolean aplicarDescuento = (i == 0) && fidelizacionService.tieneDescuentoDisponible(usuario);
-            Reserva r = crearReservaConOpciones(usuario, cancha, fechaObjetivo, horaInicio, duracionMinutos, servicios, grupoRecurrente, aplicarDescuento);
+            String cuponParaEsta = (i == 0) ? codigoCupon : null;
+            Reserva r = crearReservaConOpciones(usuario, cancha, fechaObjetivo, horaInicio, duracionMinutos, servicios, grupoRecurrente, aplicarDescuento, cuponParaEsta);
             creadas.add(r);
         }
 

@@ -77,6 +77,14 @@
                         <i class="bi bi-graph-up-arrow me-1" aria-hidden="true"></i>Reportes
                     </a>
                 </li>
+                <li class="nav-item" th:if="${usuarioActual != null && usuarioActual.rol != 'CLIENTE'}">
+                    <a class="nav-link"
+                       th:classappend="${activeTab == 'cupones' ? 'active' : ''}"
+                       th:attr="aria-current=${activeTab == 'cupones' ? 'page' : null}"
+                       th:href="@{/cupones}">
+                        <i class="bi bi-ticket-perforated-fill me-1" aria-hidden="true"></i>Generar Descuento
+                    </a>
+                </li>
                 <li class="nav-item" th:if="${usuarioActual != null && (usuarioActual.rol == 'ADMIN_SISTEMA' || usuarioActual.rol == 'ADMIN_COMPLEJO')}">
                     <a class="nav-link"
                        th:classappend="${activeTab == 'estadisticas' ? 'active' : ''}"

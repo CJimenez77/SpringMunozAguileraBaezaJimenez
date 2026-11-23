@@ -107,6 +107,7 @@ public class ReservaController {
             @RequestParam(value = "serviciosSeleccionados", required = false) List<Long> serviciosIds,
             @RequestParam(value = "recurrente", defaultValue = "false") boolean recurrente,
             @RequestParam(value = "semanasRecurrencia", defaultValue = "1") int semanasRecurrencia,
+            @RequestParam(value = "codigoCupon", required = false) String codigoCupon,
             HttpSession session,
             RedirectAttributes redirectAttributes,
             Model model) {
@@ -132,12 +133,12 @@ public class ReservaController {
             Reserva reserva;
             if (recurrente && semanasRecurrencia > 1) {
                 List<Reserva> reservas = reservaService.crearReservasRecurrentes(
-                        usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, semanasRecurrencia
+                        usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, semanasRecurrencia, codigoCupon
                 );
                 reserva = reservas.get(0);
             } else {
                 reserva = reservaService.crearReserva(
-                        usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, null
+                        usuario, cancha, fecha, horaInicio, duracionMinutos, servicios, null, codigoCupon
                 );
             }
 

@@ -1,7 +1,9 @@
 package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.controller;
 
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Cupon;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.FidelizacionInfo;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.CuponService;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service.FidelizacionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -15,9 +17,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class GlobalExceptionHandler {
 
     private final FidelizacionService fidelizacionService;
+    private final CuponService cuponService;
 
-    public GlobalExceptionHandler(FidelizacionService fidelizacionService) {
+    public GlobalExceptionHandler(FidelizacionService fidelizacionService, CuponService cuponService) {
         this.fidelizacionService = fidelizacionService;
+        this.cuponService = cuponService;
     }
 
     @ModelAttribute("usuarioActual")
@@ -38,6 +42,11 @@ public class GlobalExceptionHandler {
             return null;
         }
         return fidelizacionService.obtenerInfoFidelizacion(usuario);
+    }
+
+    @ModelAttribute("cuponVigente")
+    public Cupon cuponVigente() {
+        return cuponService.obtenerCuponVigente().orElse(null);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

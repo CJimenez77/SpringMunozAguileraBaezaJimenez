@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Código de Descuento - CanchasYa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+    <script th:src="@{/js/dark-mode.js}"></script>
+</head>
+<body class="bg-light">
+
+<nav th:replace="~{fragments/navbar :: navbar('cupones')}"></nav>
+
+<div class="container py-4 py-md-5">
+    <div class="mb-4 pb-2 border-bottom">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-ticket-perforated-fill text-primary me-2"></i>Generar Código de Descuento
+        </h2>
+        <p class="text-muted small mb-0">Crea cupones con porcentaje de descuento (máx. 20%) y vigencia en días para todos los clientes.</p>
+    </div>
+
+    <div th:if="${exito}" class="alert alert-success py-2 small text-center" role="alert">
+        <span th:text="${exito}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger py-2 small text-center" role="alert">
+        <span th:text="${error}"></span>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white py-3 px-4">
+            <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle me-2"></i>Nuevo Código de Descuento</h5>
+        </div>
+        <div class="card-body p-4">
+            <form th:action="@{/cupones/crear}" method="post">
+                <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold">Código del Cupón *</label>
+                        <input type="text" name="codigo" class="form-control text-uppercase" placeholder="EJ: VERANO20" required>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold">Porcentaje de Descuento (%) *</label>
+                        <div class="input-group">
+                            <input type="number" name="porcentaje" class="form-control" min="1" max="20" value="20" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <small class="text-muted">Máximo 20%</small>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold">Duración en Días *</label>
+                        <div class="input-group">
+                            <input type="number" name="diasDuracion" class="form-control" min="1" value="7" required>
+                            <span class="input-group-text">días</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold">Límite de Usos</label>
+                        <input type="number" name="limiteUsos" class="form-control" min="1" value="100">
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i>Crear Cupón
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-tags me-2"></i>Cupones Existentes</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Código</th>
+                        <th>Descuento</th>
+                        <th>Duración</th>
+                        <th>Expira el</th>
+                        <th>Usos</th>
+                        <th>Estado</th>
+                        <th class="text-end pe-4">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(cupones)}">
+                        <td colspan="7" class="text-center py-4 text-muted">No hay códigos de descuento registrados.</td>
+                    </tr>
+                    <tr th:each="c : ${cupones}">
+                        <td class="ps-4 fw-bold">
+                            <i class="bi bi-ticket-perforated text-primary me-1"></i>
+                            <span th:text="${c.codigo}"></span>
+                        </td>
+                        <td>
+                            <span class="badge bg-success" th:text="${c.porcentaje} + '% OFF'"></span>
+                        </td>
+                        <td th:text="${c.diasDuracion} + ' días'"></td>
+                        <td th:text="${#temporals.format(c.fechaExpiracion, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${c.usosActuales} + ' / ' + ${c.limiteUsos != null ? c.limiteUsos : '∞'}"></td>
+                        <td>
+                            <span th:if="${c.esValido()}" class="badge bg-success-subtle text-success border border-success-subtle">Vigente</span>
+                            <span th:if="${!c.esValido() && c.activo}" class="badge bg-danger-subtle text-danger border border-danger-subtle">Vencido</span>
+                            <span th:if="${!c.activo}" class="badge bg-secondary">Inactivo</span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <form th:action="@{/cupones/alternar/{id}(id=${c.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm" th:classappend="${c.activo ? 'btn-outline-danger' : 'btn-outline-success'}"
+                                        th:text="${c.activo ? 'Desactivar' : 'Activar'}">
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
