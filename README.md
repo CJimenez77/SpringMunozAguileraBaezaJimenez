@@ -69,3 +69,12 @@ Administrador de complejo
 Cliente
 - cliente@canchasya.cl - cliente123
 
+## 7. Cancelaciones y pagos compartidos
+
+- Las reservas se pueden cancelar hasta antes de su hora de inicio. El reembolso se procesa en Webpay: 100% si faltan más de 24 horas y 50% si faltan 24 horas o menos.
+- Al crear una reserva individual, se puede activar **Dividir el pago con invitados** e indicar de 2 a 30 participantes, contando al titular.
+- El titular paga su cuota y comparte el enlace generado desde el detalle de la reserva. Cada invitado debe iniciar sesión, unirse desde el enlace y pagar su cuota por Webpay.
+- La reserva queda confirmada cuando todos los participantes han pagado. Si se cancela antes, cada pago aprobado se reversa según la política de anticipación.
+- El pago compartido no está disponible para reservas recurrentes. El titular cubre cualquier diferencia de redondeo en pesos enteros.
+- Para publicar enlaces de invitación desde otro dominio, configurar `PUBLIC_BASE_URL` con la URL pública base de la aplicación.
+- Si Webpay no confirma un reverso, la cancelación queda pendiente de conciliación y no se vuelve a enviar automáticamente el mismo reembolso.

@@ -4,9 +4,11 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Pago;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Reserva;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,12 @@ import java.util.Optional;
 public interface PagoRepository extends JpaRepository<Pago, Long> {
 
     Optional<Pago> findByReserva(Reserva reserva);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Pago p SET p.estado = 'REEMBOLSO_EN_PROCESO', p.montoReembolsado = :monto "
+            + "WHERE p.id = :id AND p.estado IN ('PAGADO', 'REEMBOLSO_EN_PROCESO')")
+    int iniciarReembolso(@Param("id") Long id, @Param("monto") int monto);
 
     @Query("SELECT p FROM Pago p WHERE p.reserva.usuario = :usuario ORDER BY p.fechaPago DESC")
     List<Pago> findByUsuario(@Param("usuario") Usuario usuario);

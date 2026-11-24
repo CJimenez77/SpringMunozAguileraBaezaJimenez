@@ -204,6 +204,22 @@
                                             <option value="12">12 semanas</option>
                                         </select>
                                     </div>
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" name="pagoCompartido" value="true"
+                                            id="checkPagoCompartido" onchange="togglePagoCompartido()">
+                                        <label class="form-check-label fw-semibold" for="checkPagoCompartido">
+                                            Dividir el pago con invitados
+                                        </label>
+                                    </div>
+                                    <div id="opcionesPagoCompartido" class="mt-2" style="display: none;">
+                                        <label for="numeroParticipantes" class="form-label small">Personas que pagarán (incluyéndote)</label>
+                                        <select class="form-select form-select-sm" name="numeroParticipantes"
+                                            id="numeroParticipantes" onchange="calcularResumen()">
+                                            <option th:each="n : ${#numbers.sequence(2, 30)}" th:value="${n}"
+                                                th:text="${n} + ' participantes'"></option>
+                                        </select>
+                                        <small class="form-text">Se generará un enlace para invitar a las demás personas.</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -296,7 +312,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <span class="fw-bold fs-5">Total a Pagar:</span>
+                                <span class="fw-bold fs-5" id="etiquetaTotal">Total a Pagar:</span>
                                 <span class="fw-bold text-success fs-4" id="resumenTotal">$0 CLP</span>
                             </div>
 
@@ -309,8 +325,7 @@
 
                             <div class="mt-3 text-center">
                                 <span class="text-muted small">
-                                    <i class="bi bi-shield-check text-success me-1"></i>Cancelaciones gratis hasta 24h
-                                    antes
+                                    <i class="bi bi-shield-check text-success me-1"></i>100% de reembolso con más de 24 h; 50% con menos. Cancela antes del inicio.
                                 </span>
                             </div>
                         </div>
@@ -432,9 +447,22 @@
             const check = document.getElementById("checkRecurrente");
             const panel = document.getElementById("opcionesRecurrencia");
             const fila = document.getElementById("filaRecurrencia");
+            const pagoCompartido = document.getElementById("checkPagoCompartido");
 
             panel.style.display = check.checked ? 'block' : 'none';
             fila.style.display = check.checked ? 'flex' : 'none';
+            if (check.checked && pagoCompartido.checked) {
+                pagoCompartido.checked = false;
+                togglePagoCompartido();
+            }
+            pagoCompartido.disabled = check.checked;
+            calcularResumen();
+        }
+
+        function togglePagoCompartido() {
+            const habilitado = document.getElementById("checkPagoCompartido").checked;
+            document.getElementById("opcionesPagoCompartido").style.display = habilitado ? 'block' : 'none';
+            document.getElementById("etiquetaTotal").innerText = habilitado ? 'Tu cuota inicial:' : 'Total a Pagar:';
             calcularResumen();
         }
 
@@ -478,6 +506,12 @@
                 totalPorPartido = Math.max(0, totalPorPartido - descuentoCupon);
             }
             let totalGeneral = totalPorPartido * semanas;
+            const pagoCompartido = document.getElementById("checkPagoCompartido").checked;
+            if (pagoCompartido) {
+                const participantes = parseInt(document.getElementById("numeroParticipantes").value) || 2;
+                totalGeneral = Math.floor(totalGeneral / participantes)
+                    + (totalGeneral % participantes);
+            }
 
             document.getElementById("resumenCancha").innerText = '$' + subtotalCancha.toLocaleString('es-CL') + ' CLP';
             document.getElementById("resumenServicios").innerText = '$' + subtotalServicios.toLocaleString('es-CL') + ' CLP';
@@ -532,6 +566,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
+            toggleRecurrencia();
+            togglePagoCompartido();
             cargarDisponibilidad();
         });
     </script>

@@ -7,6 +7,7 @@ import cl.transbank.webpay.common.WebpayOptions;
 import cl.transbank.webpay.webpayplus.WebpayPlus;
 import cl.transbank.webpay.webpayplus.responses.WebpayPlusTransactionCommitResponse;
 import cl.transbank.webpay.webpayplus.responses.WebpayPlusTransactionCreateResponse;
+import cl.transbank.webpay.webpayplus.responses.WebpayPlusTransactionRefundResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -41,5 +42,14 @@ public class WebpayService {
 
     public WebpayPlusTransactionCommitResponse confirmarPago(String tokenWs) throws Exception {
         return tx.commit(tokenWs);
+    }
+
+    public WebpayPlusTransactionRefundResponse reembolsar(String tokenWs, double amount) throws Exception {
+        WebpayPlusTransactionRefundResponse response = tx.refund(tokenWs, amount);
+        if (response.getResponseCode() != 0) {
+            throw new IllegalStateException("Webpay rechazó el reembolso (código "
+                    + response.getResponseCode() + ").");
+        }
+        return response;
     }
 }

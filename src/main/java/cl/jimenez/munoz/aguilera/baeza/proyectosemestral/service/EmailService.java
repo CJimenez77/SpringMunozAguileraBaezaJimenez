@@ -48,7 +48,14 @@ public class EmailService {
     }
 
     public void enviarConfirmacionReserva(Reserva reserva) {
-        String destinatario = reserva.getUsuario().getEmail();
+        enviarConfirmacionReserva(reserva, reserva.getUsuario());
+    }
+
+    public void enviarConfirmacionReserva(Reserva reserva, Usuario destinatarioUsuario) {
+        if (destinatarioUsuario == null || destinatarioUsuario.getEmail() == null || destinatarioUsuario.getEmail().isBlank()) {
+            return;
+        }
+        String destinatario = destinatarioUsuario.getEmail();
         String asunto = "Confirmación de Reserva #" + reserva.getCodigoReserva() + " - CanchasYa";
 
         String contenidoHtml = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>"
@@ -57,7 +64,7 @@ public class EmailService {
                 + "<p style='color: #6c757d; font-size: 14px;'>Código: <strong>" + reserva.getCodigoReserva()
                 + "</strong></p>"
                 + "</div>"
-                + "<p>Hola <strong>" + reserva.getUsuario().getNombre() + "</strong>,</p>"
+                + "<p>Hola <strong>" + destinatarioUsuario.getNombre() + "</strong>,</p>"
                 + "<p>Tu reserva ha sido procesada exitosamente con los siguientes detalles:</p>"
                 + "<table style='width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;'>"
                 + "<tr style='background-color: #f8f9fa;'><td style='padding: 8px; border: 1px solid #dee2e6;'><strong>Complejo:</strong></td><td style='padding: 8px; border: 1px solid #dee2e6;'>"
@@ -79,8 +86,22 @@ public class EmailService {
     }
 
     public void enviarCancelacionReserva(Reserva reserva) {
-        String destinatario = reserva.getUsuario().getEmail();
+        enviarCancelacionReserva(reserva, reserva.getUsuario(), true);
+    }
+
+    public void enviarCancelacionReserva(Reserva reserva, boolean huboReembolso) {
+        enviarCancelacionReserva(reserva, reserva.getUsuario(), huboReembolso);
+    }
+
+    public void enviarCancelacionReserva(Reserva reserva, Usuario destinatarioUsuario, boolean huboReembolso) {
+        if (destinatarioUsuario == null || destinatarioUsuario.getEmail() == null || destinatarioUsuario.getEmail().isBlank()) {
+            return;
+        }
+        String destinatario = destinatarioUsuario.getEmail();
         String asunto = "Cancelación de Reserva #" + reserva.getCodigoReserva() + " - CanchasYa";
+        String parrafoReembolso = huboReembolso
+                ? "<p>El reembolso se procesó por el porcentaje correspondiente a la anticipación de la cancelación, a través del método de pago original.</p>"
+                : "<p>La reserva no registraba pagos aprobados, por lo que no se requirió reembolso.</p>";
 
         String contenidoHtml = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>"
                 + "<div style='text-align: center; margin-bottom: 20px;'>"
@@ -88,13 +109,11 @@ public class EmailService {
                 + "<p style='color: #6c757d; font-size: 14px;'>Código: <strong>" + reserva.getCodigoReserva()
                 + "</strong></p>"
                 + "</div>"
-                + "<p>Hola <strong>" + reserva.getUsuario().getNombre() + "</strong>,</p>"
+                + "<p>Hola <strong>" + destinatarioUsuario.getNombre() + "</strong>,</p>"
                 + "<p>Te confirmamos que tu reserva en <strong>" + reserva.getCancha().getNombre_cancha()
                 + "</strong> para el día <strong>" + reserva.getFecha().format(dateFormatter)
-                + "</strong> a las <strong>" + reserva.getHoraInicio().format(timeFormatter)
-                + " hrs</strong> ha sido cancelada dentro del plazo estipulado.</p>"
-                + "<p>El monto de <strong>$" + String.format("%,d", reserva.getPrecioTotal()).replace(',', '.')
-                + " CLP</strong> ha sido marcado para reembolso a través del mismo método de pago original.</p>"
+                + " hrs</strong> ha sido cancelada.</p>"
+                + parrafoReembolso
                 + "</div>";
 
         enviarHtml(destinatario, asunto, contenidoHtml);

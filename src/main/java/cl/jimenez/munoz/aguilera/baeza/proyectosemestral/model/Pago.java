@@ -18,6 +18,9 @@ public class Pago {
     @Column(nullable = false)
     private Integer monto;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer montoReembolsado = 0;
+
     @Column(nullable = false, length = 40)
     private String metodoPago;
 
@@ -50,6 +53,9 @@ public class Pago {
     public Integer getMonto() { return monto; }
     public void setMonto(Integer monto) { this.monto = monto; }
 
+    public Integer getMontoReembolsado() { return montoReembolsado; }
+    public void setMontoReembolsado(Integer montoReembolsado) { this.montoReembolsado = montoReembolsado; }
+
     public String getMetodoPago() { return metodoPago; }
     public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
 
@@ -71,4 +77,3 @@ public class Pago {
     public LocalDateTime getFechaPago() { return fechaPago; }
     public void setFechaPago(LocalDateTime fechaPago) { this.fechaPago = fechaPago; }
 }
-

@@ -1,10 +1,10 @@
 package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model;
 
 import jakarta.persistence.*;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +68,9 @@ public class Reserva {
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean recordatorio2hEnviado = false;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer porcentajeReembolsoAplicado = 0;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -136,12 +139,26 @@ public class Reserva {
     public boolean isRecordatorio2hEnviado() { return recordatorio2hEnviado; }
     public void setRecordatorio2hEnviado(boolean recordatorio2hEnviado) { this.recordatorio2hEnviado = recordatorio2hEnviado; }
 
+    public Integer getPorcentajeReembolsoAplicado() { return porcentajeReembolsoAplicado; }
+    public void setPorcentajeReembolsoAplicado(Integer porcentajeReembolsoAplicado) { this.porcentajeReembolsoAplicado = porcentajeReembolsoAplicado; }
+
+    public static final ZoneId ZONA_SANTIAGO = ZoneId.of("America/Santiago");
+
     public boolean esCancelable() {
         if (!"CONFIRMADA".equals(estado) && !"PENDIENTE".equals(estado)) {
             return false;
         }
         LocalDateTime fechaHoraInicio = LocalDateTime.of(fecha, horaInicio);
-        return Duration.between(LocalDateTime.now(), fechaHoraInicio).toHours() >= 24;
+        return fechaHoraInicio.isAfter(LocalDateTime.now(ZONA_SANTIAGO));
+    }
+
+    public int porcentajeReembolso() {
+        return porcentajeReembolso(LocalDateTime.now(ZONA_SANTIAGO));
+    }
+
+    public int porcentajeReembolso(LocalDateTime ahora) {
+        LocalDateTime fechaHoraInicio = LocalDateTime.of(fecha, horaInicio);
+        return fechaHoraInicio.isAfter(ahora.plusHours(24)) ? 100 : 50;
     }
 
     public boolean esTransferible() {
@@ -152,4 +169,3 @@ public class Reserva {
         return fechaHoraInicio.isAfter(LocalDateTime.now());
     }
 }
-

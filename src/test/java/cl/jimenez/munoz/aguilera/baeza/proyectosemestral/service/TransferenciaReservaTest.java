@@ -2,6 +2,9 @@ package cl.jimenez.munoz.aguilera.baeza.proyectosemestral.service;
 
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.*;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.PagoRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.CanchaRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.InvitacionReservaRepository;
+import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ParticipanteReservaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.ReservaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.TransferenciaReservaRepository;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.UsuarioRepository;
@@ -43,6 +46,24 @@ class TransferenciaReservaTest {
 
     @Mock
     private EmailService emailService;
+
+    @Mock
+    private CanchaRepository canchaRepository;
+
+    @Mock
+    private FidelizacionService fidelizacionService;
+
+    @Mock
+    private CuponService cuponService;
+
+    @Mock
+    private InvitacionReservaRepository invitacionReservaRepository;
+
+    @Mock
+    private ParticipanteReservaRepository participanteReservaRepository;
+
+    @Mock
+    private WebpayService webpayService;
 
     @InjectMocks
     private ReservaService reservaService;

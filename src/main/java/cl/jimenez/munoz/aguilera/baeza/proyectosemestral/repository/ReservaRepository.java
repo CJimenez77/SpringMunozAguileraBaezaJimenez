@@ -5,15 +5,31 @@ import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Reserva;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.model.Usuario;
 import cl.jimenez.munoz.aguilera.baeza.proyectosemestral.repository.projection.EstadisticasProyecciones;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Reserva r SET r.estado = 'CANCELACION_EN_PROCESO', "
+            + "r.porcentajeReembolsoAplicado = :porcentaje WHERE r.id = :id "
+            + "AND r.estado IN ('PENDIENTE', 'CONFIRMADA', 'CANCELACION_PENDIENTE')")
+    int iniciarCancelacion(@Param("id") Long id, @Param("porcentaje") int porcentaje);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Reserva r SET r.estado = :estadoNuevo WHERE r.id = :id AND r.estado = :estadoActual")
+    int cambiarEstadoCancelacion(@Param("id") Long id, @Param("estadoActual") String estadoActual,
+                                 @Param("estadoNuevo") String estadoNuevo);
 
     @Query("SELECT r FROM Reserva r WHERE r.usuario = :usuario AND r.estado IN ('CONFIRMADA', 'COMPLETADA') ORDER BY r.id ASC")
     List<Reserva> findValidasPorUsuario(@Param("usuario") Usuario usuario);

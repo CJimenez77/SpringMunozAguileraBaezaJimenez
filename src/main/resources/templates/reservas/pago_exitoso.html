@@ -38,6 +38,9 @@
                     </div>
 
                     <div class="d-flex flex-column gap-2">
+                        <a th:if="${participanteActual != null}"
+                           th:href="@{/reservas/invitacion/{codigo}(codigo=${participanteActual.invitacion.codigo})}"
+                           class="btn btn-outline-primary">Ver invitación y participantes</a>
                         <a th:href="@{/reservas/mis-reservas}" class="btn btn-success fw-semibold shadow-sm">
                             <i class="bi bi-calendar-check me-1"></i>Ver Mis Reservas
                         </a>
